@@ -83,6 +83,7 @@ namespace Interpreter
                 case '-': AddToken(TokenType.Minus); break;
                 case '+': AddToken(TokenType.Plus); break;
                 case '*': AddToken(TokenType.Star); break;
+                case '%': AddToken(TokenType.Percent); break;
                 // Double characters
                 case '!':
                     AddToken(Match('=') ? TokenType.BangEqual : TokenType.Bang);

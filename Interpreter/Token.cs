@@ -33,7 +33,7 @@ namespace Interpreter
         LeftParenthesis, RightParenthesis,
         LeftBrace, RightBrace,
         Comma, Dot, Semicolon,
-        Minus, Plus, Slash, Star,
+        Minus, Plus, Slash, Star, Percent,
 
         // One/two character tokens
         Bang, BangEqual,
