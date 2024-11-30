@@ -9,20 +9,25 @@
                 return 64;
             }
 
+
             if (args.Length == 1)
             {
-                RunFile(args[0]);
-                return 0;
+                ErrorReporter errorReporter = new ErrorReporter();
+                RunFile(args[0], errorReporter);
+                if (errorReporter.HadError)
+                    return 65;
+                else
+                    return 0;
             }
 
             RunPrompt();
             return 0;
         }
 
-        static void RunFile(string path)
+        static void RunFile(string path, ErrorReporter errorReporter)
         {
             StreamReader reader = new StreamReader(path);
-            Run(reader.ReadToEnd());
+            Run(reader.ReadToEnd(), errorReporter);
         }
 
         static void RunPrompt()
@@ -33,19 +38,24 @@
                 string? line = Console.ReadLine();
                 if (line == null || line == "exit")
                     break;
-                Run(line);
+
+                ErrorReporter errorReporter = new ErrorReporter();
+                Run(line, errorReporter);
             }
         }
 
-        static void Run(string source)
+        static void Run(string source, ErrorReporter errorReporter)
         {
-            Scanner scanner = new Scanner(source);
+
+            Scanner scanner = new Scanner(source, errorReporter);
             List<Token> tokens = scanner.ScanTokens();
 
             foreach (Token token in tokens)
             {
                 Console.WriteLine(token);
             }
+
+            errorReporter.Display(Console.Error);
         }
     }
 }

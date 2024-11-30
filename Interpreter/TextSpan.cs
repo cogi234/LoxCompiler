@@ -8,18 +8,14 @@ namespace Interpreter
 {
     internal struct TextSpan
     {
-        public int Start {  get; private set; }
-        public int Length { get; private set; }
+        public int Start {  get; }
+        public int Length { get; }
         public int End { get => Start + Length; }
-        public int Line { get; private set; }
-        public int Column { get; private set; }
 
-        public TextSpan(int start, int length, int line, int column)
+        public TextSpan(int start, int length)
         {
             Start = start;
             Length = length;
-            Line = line;
-            Column = column;
         }
     }
 }
