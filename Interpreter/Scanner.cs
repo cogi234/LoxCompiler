@@ -147,7 +147,7 @@ namespace Interpreter
                         case 't': sb.Append('\t'); break;
                         case '0': sb.Append('\0'); break;
                         default:
-                            errorReporter.Report(TextSpan.FromEnd(escapeStart, current), "Unrecognized escape sequence.");
+                            errorReporter.Report(TextSpan.FromBounds(escapeStart, current), "Unrecognized escape sequence.");
                             break;
                     }
                 } else if (Peek() == '"' || IsAtEnd())
@@ -158,7 +158,7 @@ namespace Interpreter
 
             if (IsAtEnd())
             {
-                TextSpan errorSpan = TextSpan.FromEnd(start, current);
+                TextSpan errorSpan = TextSpan.FromBounds(start, current);
                 errorReporter.Report(errorSpan, "Unterminated string.");
                 return;
             }
@@ -184,7 +184,7 @@ namespace Interpreter
                     Advance();
             }
 
-            TextSpan span = TextSpan.FromEnd(start, current);
+            TextSpan span = TextSpan.FromBounds(start, current);
 
             if (isFloat)
             {
@@ -202,7 +202,7 @@ namespace Interpreter
             while (IsAlphaNumeric(Peek()))
                 Advance();
 
-            TextSpan span = TextSpan.FromEnd(start, current);
+            TextSpan span = TextSpan.FromBounds(start, current);
             string text = source.Substring(span.Start, span.Length);
             if (keywords.ContainsKey(text))
                 AddToken(keywords[text]);
@@ -240,7 +240,7 @@ namespace Interpreter
 
         private void AddToken(TokenType type, object? literal = null)
         {
-            TextSpan span = TextSpan.FromEnd(start, current);
+            TextSpan span = TextSpan.FromBounds(start, current);
             string text = source.Substring(span.Start, span.Length);
             tokens.Add(new Token(type, text, span, literal));
         }

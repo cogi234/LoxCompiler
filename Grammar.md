@@ -11,8 +11,8 @@ expression -> literal
 			| unary
 			| binary
 			| grouping ;
-literal -> INTEGER | FLOAT | STRING | "true" | "false" | "nil" ;
-grouping -> "(" expression ")" ;
-unary -> ( "-" | "!" ) expression ;
 binary -> expression operator expression;
+unary -> ( "-" | "!" ) expression ;
+grouping -> "(" expression ")" ;
 operator -> all the binary operators (\=\=, !=, +, \*, etc.)
+literal -> INTEGER | FLOAT | STRING | "true" | "false" | "nil" ;

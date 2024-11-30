@@ -23,7 +23,7 @@ namespace Interpreter
         /// </summary>
         /// <param name="start">The index of the first character</param>
         /// <param name="end">The index after the last character</param>
-        public static TextSpan FromEnd(int start, int end)
+        public static TextSpan FromBounds(int start, int end)
         {
             return new TextSpan(start, end - start);
         }
