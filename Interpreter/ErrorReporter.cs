@@ -39,7 +39,7 @@ namespace Interpreter
 
         public override string ToString()
         {
-            return $"[start: {Span.Start}, end: {Span.End}] Error: {Message}";
+            return $"[start: {Span.Start}, length: {Span.Length}] Error: {Message}";
         }
     }
 }

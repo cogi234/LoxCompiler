@@ -46,7 +46,6 @@
 
         static void Run(string source, ErrorReporter errorReporter)
         {
-
             Scanner scanner = new Scanner(source, errorReporter);
             List<Token> tokens = scanner.ScanTokens();
 

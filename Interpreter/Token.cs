@@ -13,7 +13,7 @@ namespace Interpreter
         public TextSpan Span { get; }
         public object? Literal { get; }
 
-        public Token(TokenType type, string lexeme, TextSpan span, object literal)
+        public Token(TokenType type, string lexeme, TextSpan span, object? literal)
         {
             Type = type;
             Lexeme = lexeme;
@@ -42,15 +42,15 @@ namespace Interpreter
         Lesser, LesserEqual,
 
         // Literals
-        Identifier, String, Integer, Float,
+        Identifier, StringLiteral, IntegerLiteral, FloatLiteral,
 
         // Keywords
         TrueKeyword, FalseKeyword,
         AndKeyword, OrKeyword,
         IfKeyword, ElseKeyword,
-        WhileKeyword, ForKeyword,
-        ClassKeyword, NewKeyword, FunctionKeyword, PrintKeyword,
-        SuperKeyword, ThisKeyword,
+        WhileKeyword, ForKeyword, BreakKeyword,
+        ClassKeyword, NewKeyword, ThisKeyword,
+        FunctionKeyword, PrintKeyword, SuperKeyword,
         VarKeyword, StringKeyword, IntKeyword, FloatKeyword, NilKeyword,
 
         // Misc
