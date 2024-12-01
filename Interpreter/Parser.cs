@@ -37,6 +37,12 @@
         /// </summary>
         private Expression Equality()
         {
+            if (Match(TokenType.BangEqual, TokenType.EqualEqual))
+            {
+                Error(Previous(), "Missing left side of the comparison.");
+                return Comparison();
+            }
+
             Expression expression = Comparison();
 
             while (Match(TokenType.BangEqual, TokenType.EqualEqual))
@@ -54,6 +60,12 @@
         /// </summary>
         private Expression Comparison()
         {
+            if (Match(TokenType.Greater, TokenType.GreaterEqual, TokenType.Lesser, TokenType.LesserEqual))
+            {
+                Error(Previous(), "Missing left side of the comparison.");
+                return Term();
+            }
+
             Expression expression = Term();
 
             while (Match(TokenType.Greater, TokenType.GreaterEqual, TokenType.Lesser, TokenType.LesserEqual))
@@ -71,6 +83,12 @@
         /// </summary>
         private Expression Term()
         {
+            if (Match(TokenType.Plus))
+            {
+                Error(Previous(), "Missing left side of the operation.");
+                return Factor();
+            }
+
             Expression expression = Factor();
 
             while (Match(TokenType.Minus, TokenType.Plus))
@@ -88,6 +106,12 @@
         /// </summary>
         private Expression Factor()
         {
+            if (Match(TokenType.Slash, TokenType.Star, TokenType.Percent))
+            {
+                Error(Previous(), "Missing left side of the operation.");
+                return Unary();
+            }
+
             Expression expression = Unary();
 
             while (Match(TokenType.Slash, TokenType.Star, TokenType.Percent))
