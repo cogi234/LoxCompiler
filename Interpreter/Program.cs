@@ -4,7 +4,8 @@
     {
         static int Main(string[] args)
         {
-            if (args.Length > 1) {
+            if (args.Length > 1)
+            {
                 Console.WriteLine("Usage: lox [script]");
                 return 64;
             }
@@ -49,12 +50,16 @@
             Scanner scanner = new Scanner(source, errorReporter);
             List<Token> tokens = scanner.ScanTokens();
 
-            foreach (Token token in tokens)
+            Parser parser = new Parser(tokens, errorReporter);
+            Expression? expression = parser.Parse();
+
+            if (errorReporter.HadError || expression == null)
             {
-                Console.WriteLine(token);
+                errorReporter.Display(Console.Error);
+                return;
             }
 
-            errorReporter.Display(Console.Error);
+            Console.WriteLine(new AstPrinter().print(expression));
         }
     }
 }

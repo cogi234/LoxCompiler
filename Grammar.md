@@ -7,12 +7,11 @@ nonterminal -> "terminal" nonterminal LITERAL_TERMINAL ;
 ? : optional
 
 ## Expressions
-expression -> literal
-			| unary
-			| binary
-			| grouping ;
-binary -> expression operator expression;
-unary -> ( "-" | "!" ) expression ;
-grouping -> "(" expression ")" ;
-operator -> all the binary operators (\=\=, !=, +, \*, etc.)
-literal -> INTEGER | FLOAT | STRING | "true" | "false" | "nil" ;
+expression -> equality ;
+equality -> comparison ( ( "!=" | "\=\=" ) comparison )\* ;
+comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )\* ;
+term -> factor ( ( "-" | "+" ) factor )\* ;
+factor -> unary ( ( "/" | "\*" | "%" ) unary )\* ;
+unary -> ( "!" | "-" ) unary 
+		| primary ;
+primary -> INTEGER | FLOAT | STRING | "true" | "false" | "nil" | ( "(" expression ")" ) ;

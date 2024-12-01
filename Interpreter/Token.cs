@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Interpreter
+﻿namespace Interpreter
 {
     internal class Token
     {
@@ -50,7 +44,7 @@ namespace Interpreter
         IfKeyword, ElseKeyword,
         WhileKeyword, ForKeyword, BreakKeyword,
         ClassKeyword, NewKeyword, ThisKeyword,
-        FunctionKeyword, PrintKeyword, SuperKeyword,
+        FunctionKeyword, PrintKeyword, SuperKeyword, ReturnKeyword,
         VarKeyword, StringKeyword, IntKeyword, FloatKeyword, NilKeyword,
 
         // Misc

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Text;
 
 namespace Interpreter
 {
@@ -31,6 +26,7 @@ namespace Interpreter
             { "function", TokenType.FunctionKeyword },
             { "print", TokenType.PrintKeyword },
             { "super", TokenType.SuperKeyword },
+            { "return", TokenType.ReturnKeyword },
 
             { "var", TokenType.VarKeyword },
             { "string", TokenType.StringKeyword },
@@ -47,7 +43,7 @@ namespace Interpreter
 
         private int start = 0, current = 0;
 
-        public Scanner(string  source, ErrorReporter errorReporter)
+        public Scanner(string source, ErrorReporter errorReporter)
         {
             this.source = source;
             this.errorReporter = errorReporter;
@@ -56,7 +52,7 @@ namespace Interpreter
 
         public List<Token> ScanTokens()
         {
-            while(!IsAtEnd())
+            while (!IsAtEnd())
             {
                 // We are at the beginning of the next lexeme
                 start = current;
@@ -98,15 +94,19 @@ namespace Interpreter
                     AddToken(Match('=') ? TokenType.LesserEqual : TokenType.Lesser);
                     break;
                 case '/':
-                    if (Match('/')) {
+                    if (Match('/'))
+                    {
                         // A line comment.
                         while (Peek() != '\n' && !IsAtEnd())
                             Advance();
-                    } else if (Match('*')) {
+                    }
+                    else if (Match('*'))
+                    {
                         // A multi-line comment.
                         while (!MatchTwo('*', '/') && !IsAtEnd())
                             Advance();
-                    } else
+                    }
+                    else
                         AddToken(TokenType.Slash);
                     break;
                 // Whitespace
@@ -150,7 +150,8 @@ namespace Interpreter
                             errorReporter.Report(TextSpan.FromBounds(escapeStart, current), "Unrecognized escape sequence.");
                             break;
                     }
-                } else if (Peek() == '"' || IsAtEnd())
+                }
+                else if (Peek() == '"' || IsAtEnd())
                     break;
                 else
                     sb.Append(Advance());
@@ -172,7 +173,7 @@ namespace Interpreter
         {
             bool isFloat = false;
             // Whole part
-            while(IsDigit(Peek()))
+            while (IsDigit(Peek()))
                 Advance();
 
             // Fractionnal part
@@ -190,7 +191,8 @@ namespace Interpreter
             {
                 double value = double.Parse(source.Substring(span.Start, span.Length));
                 AddToken(TokenType.FloatLiteral, value);
-            } else
+            }
+            else
             {
                 int value = int.Parse(source.Substring(span.Start, span.Length));
                 AddToken(TokenType.IntegerLiteral, value);

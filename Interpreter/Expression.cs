@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Interpreter
+﻿namespace Interpreter
 {
     internal abstract class Expression
     {
         public TextSpan Span { get; }
-        public Expression(TextSpan span) {
+        public Expression(TextSpan span)
+        {
             Span = span;
         }
 
