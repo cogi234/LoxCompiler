@@ -229,6 +229,12 @@ namespace Interpreter
 
         private void AddToken(TokenType type, object? literal = null)
         {
+            //Hardcode literal values into the keywords
+            if (type == TokenType.TrueKeyword)
+                literal = true;
+            else if (type == TokenType.FalseKeyword)
+                literal = false;
+
             TextSpan span = TextSpan.FromBounds(start, current);
             string text = source.Substring(span.Start, span.Length);
             tokens.Add(new Token(type, text, span, literal));

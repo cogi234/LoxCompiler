@@ -6,24 +6,56 @@ using System.Threading.Tasks;
 
 namespace Interpreter
 {
-    internal class Interpreter : Expression.IVisitor<object?>
+    internal class Interpreter : Expression.IVisitor<object?>, Statement.IVisitor<object?>/*Can't put void here in C#*/
     {
         private ErrorReporter errorReporter = new ErrorReporter();
+        private Environment environment = new Environment();
 
-        public void Interpret(Expression expression, ErrorReporter errorReporter)
+        public void Interpret(List<Statement> statements, ErrorReporter errorReporter)
         {
             this.errorReporter = errorReporter;
             try
             {
-                object? result = Evaluate(expression);
-                Console.WriteLine(Stringify(result));
+                foreach (Statement statement in statements)
+                {
+                    Execute(statement);
+                }
             } catch (RuntimeError error)
             {
                 errorReporter.Report(error.token.Span, error.Message, ErrorType.Runtime);
             }
         }
 
-        #region Visitor
+        private void Execute(Statement statement)
+        {
+            statement.accept(this);
+        }
+
+        #region Statement Visitor
+        public object? visit(Statement.VariableDeclaration statement)
+        {
+            object? value = null;
+            if (statement.Initializer != null)
+                value = Evaluate(statement.Initializer);
+
+            environment.Define(statement.Name.Lexeme, value);
+
+            return null;
+        }
+        public object? visit(Statement.ExpressionStatement statement)
+        {
+            Evaluate(statement.Expression);
+            return null;
+        }
+        public object? visit(Statement.Print statement)
+        {
+            object? value = Evaluate(statement.Expression);
+            Console.WriteLine(Stringify(value));
+            return null;
+        }
+        #endregion
+
+        #region Expression Visitor
         public object? visit(Expression.Binary expression)
         {
             object? left = Evaluate(expression.Left);
@@ -66,7 +98,6 @@ namespace Interpreter
 
             return null;
         }
-
         public object? visit(Expression.Unary expression)
         {
             object? right = Evaluate(expression.Expression);
@@ -82,15 +113,17 @@ namespace Interpreter
 
             return null;
         }
-
         public object? visit(Expression.Grouping expression)
         {
             return Evaluate(expression.Expression);
         }
-
         public object? visit(Expression.Literal expression)
         {
             return expression.LiteralToken.Literal;
+        }
+        public object? visit(Expression.Variable expression)
+        {
+            return environment.Get(expression.Name);
         }
         #endregion
 

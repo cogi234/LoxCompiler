@@ -12,16 +12,81 @@
             this.errorReporter = errorReporter;
         }
 
-        public Expression? Parse()
+        public List<Statement> Parse()
+        {
+            List<Statement> statements = new List<Statement>();
+            while (!IsAtEnd())
+            {
+                Statement? s = Declaration();
+                if (s != null)
+                    statements.Add(s);
+            }
+
+            return statements;
+        }
+
+        #region Statement Grammar
+        /// <summary>
+        /// declaration -> variableDeclaration | statement ;
+        /// </summary>
+        private Statement? Declaration()
         {
             try
             {
-                return Expression();
-            } catch(ParserError error)
+                if (Match(TokenType.VarKeyword))
+                    return VariableDeclaration();
+                return Statement();
+            } catch (ParseError error)
             {
+                Synchronize();
                 return null;
             }
         }
+        /// <summary>
+        /// declaration -> variableDeclaration | statement ;
+        /// </summary>
+        private Statement VariableDeclaration()
+        {
+            Token varToken = Previous();
+            Token name = Consume(TokenType.Identifier, "Expected a variable name.");
+
+            Expression? initializer = null;
+            if (Match(TokenType.Equal))
+                initializer = Expression();
+
+            Consume(TokenType.Semicolon, "Expected ';' after variable declaration.");
+
+            return new Statement.VariableDeclaration(varToken, name, initializer);
+        }
+        /// <summary>
+        /// statement -> expressionStatement | printStatement ;
+        /// </summary>
+        private Statement Statement()
+        {
+            if (Match(TokenType.PrintKeyword))
+                return PrintStatement();
+
+            return ExpressionStatement();
+        }
+        /// <summary>
+        /// expressionStatement -> expression ";" ;
+        /// </summary>
+        private Statement ExpressionStatement()
+        {
+            Expression expression = Expression();
+            Consume(TokenType.Semicolon, "Expected ';' after expression.");
+            return new Statement.ExpressionStatement(expression);
+        }
+        /// <summary>
+        /// printStatement -> "print" expression ";" ;
+        /// </summary>
+        private Statement PrintStatement()
+        {
+            Expression expression = Expression();
+            Consume(TokenType.Semicolon, "Expected ';' after value.");
+            return new Statement.Print(expression);
+        }
+        #endregion
 
         #region Expression Grammar
         /// <summary>
@@ -152,6 +217,10 @@
                 )) 
                 return new Expression.Literal(Previous());
 
+            //Variable expression
+            if (Match(TokenType.Identifier))
+                return new Expression.Variable(Previous());
+
             // Grouping
             if (Match(TokenType.LeftParenthesis))
             {
@@ -195,10 +264,10 @@
         #endregion
 
         #region Error handling
-        private ParserError Error(Token token, string message)
+        private ParseError Error(Token token, string message)
         {
             errorReporter.Report(token.Span, message, ErrorType.Compiler);
-            return new ParserError();
+            return new ParseError();
         }
 
         /// <summary>
@@ -229,7 +298,7 @@
             }
         }
 
-        internal class ParserError : Exception { }
+        internal class ParseError : Exception { }
         #endregion
     }
 

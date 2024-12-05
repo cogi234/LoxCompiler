@@ -15,6 +15,7 @@
             T visit(Unary expression);
             T visit(Grouping expression);
             T visit(Literal expression);
+            T visit(Variable expression);
         }
         public abstract T accept<T>(IVisitor<T> visitor);
         #endregion
@@ -39,7 +40,6 @@
                 return visitor.visit(this);
             }
         }
-
         internal class Unary : Expression
         {
             public Token Operator { get; }
@@ -57,7 +57,6 @@
                 return visitor.visit(this);
             }
         }
-
         internal class Grouping : Expression
         {
             public Expression Expression { get; }
@@ -73,7 +72,6 @@
                 return visitor.visit(this);
             }
         }
-
         internal class Literal : Expression
         {
             public Token LiteralToken { get; }
@@ -81,6 +79,20 @@
             public Literal(Token literalToken) : base(literalToken.Span)
             {
                 LiteralToken = literalToken;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.visit(this);
+            }
+        }
+        internal class Variable : Expression
+        {
+            public Token Name { get; }
+
+            public Variable(Token name) : base(name.Span)
+            {
+                Name = name;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

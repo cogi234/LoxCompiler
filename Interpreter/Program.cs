@@ -54,18 +54,15 @@
             List<Token> tokens = scanner.ScanTokens();
 
             Parser parser = new Parser(tokens, errorReporter);
-            Expression? expression = parser.Parse();
+            List<Statement> statements = parser.Parse();
 
-            if (errorReporter.HadCompilerError || expression == null)
+            if (errorReporter.HadCompilerError)
             {
                 errorReporter.Display(Console.Error, ErrorType.Compiler);
                 return;
             }
 
-            //Print the AST
-            //Console.WriteLine(new AstPrinter().print(expression));
-
-            interpreter.Interpret(expression, errorReporter);
+            interpreter.Interpret(statements, errorReporter);
             if (errorReporter.HadRuntimeError)
                 errorReporter.Display(Console.Error, ErrorType.Runtime);
         }
