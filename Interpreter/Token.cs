@@ -36,7 +36,7 @@
         Lesser, LesserEqual,
 
         // Literals
-        Identifier, StringLiteral, IntegerLiteral, FloatLiteral,
+        Identifier, StringLiteral, NumberLiteral,
 
         // Keywords
         TrueKeyword, FalseKeyword,
@@ -45,7 +45,7 @@
         WhileKeyword, ForKeyword, BreakKeyword,
         ClassKeyword, NewKeyword, ThisKeyword,
         FunctionKeyword, PrintKeyword, SuperKeyword, ReturnKeyword,
-        VarKeyword, StringKeyword, IntKeyword, FloatKeyword, NilKeyword,
+        VarKeyword, NilKeyword,
 
         // Misc
         EndOfFile

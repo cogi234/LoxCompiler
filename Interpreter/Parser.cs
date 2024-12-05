@@ -146,7 +146,7 @@
             if (Match(
                 TokenType.StringLiteral,
                 TokenType.IntegerLiteral,
-                TokenType.FloatLiteral,
+                TokenType.NumberLiteral,
                 TokenType.FalseKeyword,
                 TokenType.TrueKeyword,
                 TokenType.NilKeyword

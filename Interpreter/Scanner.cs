@@ -29,9 +29,6 @@ namespace Interpreter
             { "return", TokenType.ReturnKeyword },
 
             { "var", TokenType.VarKeyword },
-            { "string", TokenType.StringKeyword },
-            { "int", TokenType.IntKeyword },
-            { "float", TokenType.FloatKeyword },
             { "nil", TokenType.NilKeyword },
         };
         #endregion
@@ -171,7 +168,6 @@ namespace Interpreter
 
         private void Number()
         {
-            bool isFloat = false;
             // Whole part
             while (IsDigit(Peek()))
                 Advance();
@@ -179,7 +175,6 @@ namespace Interpreter
             // Fractionnal part
             if (Peek() == '.' && IsDigit(PeekNext()))
             {
-                isFloat = true;
                 Advance();// Consume the "."
                 while (IsDigit(Peek()))
                     Advance();
@@ -187,16 +182,8 @@ namespace Interpreter
 
             TextSpan span = TextSpan.FromBounds(start, current);
 
-            if (isFloat)
-            {
-                double value = double.Parse(source.Substring(span.Start, span.Length));
-                AddToken(TokenType.FloatLiteral, value);
-            }
-            else
-            {
-                int value = int.Parse(source.Substring(span.Start, span.Length));
-                AddToken(TokenType.IntegerLiteral, value);
-            }
+            double value = double.Parse(source.Substring(span.Start, span.Length));
+            AddToken(TokenType.NumberLiteral, value);
         }
 
         private void Identifier()
