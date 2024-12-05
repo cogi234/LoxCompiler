@@ -120,7 +120,7 @@ namespace Interpreter
                     else if (IsAlpha(c))
                         Identifier();
                     else
-                        errorReporter.Report(new TextSpan(current, 1), "Unexpected character.");
+                        errorReporter.Report(new TextSpan(current, 1), "Unexpected character.", ErrorType.Compiler);
                     break;
             }
         }
@@ -144,7 +144,7 @@ namespace Interpreter
                         case 't': sb.Append('\t'); break;
                         case '0': sb.Append('\0'); break;
                         default:
-                            errorReporter.Report(TextSpan.FromBounds(escapeStart, current), "Unrecognized escape sequence.");
+                            errorReporter.Report(TextSpan.FromBounds(escapeStart, current), "Unrecognized escape sequence.", ErrorType.Compiler);
                             break;
                     }
                 }
@@ -157,7 +157,7 @@ namespace Interpreter
             if (IsAtEnd())
             {
                 TextSpan errorSpan = TextSpan.FromBounds(start, current);
-                errorReporter.Report(errorSpan, "Unterminated string.");
+                errorReporter.Report(errorSpan, "Unterminated string.", ErrorType.Compiler);
                 return;
             }
 

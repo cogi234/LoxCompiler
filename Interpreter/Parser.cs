@@ -145,7 +145,6 @@
             // Literals
             if (Match(
                 TokenType.StringLiteral,
-                TokenType.IntegerLiteral,
                 TokenType.NumberLiteral,
                 TokenType.FalseKeyword,
                 TokenType.TrueKeyword,
@@ -198,7 +197,7 @@
         #region Error handling
         private ParserError Error(Token token, string message)
         {
-            errorReporter.Report(token.Span, message);
+            errorReporter.Report(token.Span, message, ErrorType.Compiler);
             return new ParserError();
         }
 
@@ -221,9 +220,6 @@
                     case TokenType.ForKeyword:
                     case TokenType.WhileKeyword:
                     case TokenType.VarKeyword:
-                    case TokenType.IntKeyword:
-                    case TokenType.FloatKeyword:
-                    case TokenType.StringKeyword:
                     case TokenType.ReturnKeyword:
                     case TokenType.PrintKeyword:
                         return;

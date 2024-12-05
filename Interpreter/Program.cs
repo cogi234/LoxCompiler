@@ -2,6 +2,7 @@
 {
     internal class Program
     {
+        private static readonly Interpreter interpreter = new Interpreter();
         static int Main(string[] args)
         {
             if (args.Length > 1)
@@ -15,8 +16,10 @@
             {
                 ErrorReporter errorReporter = new ErrorReporter();
                 RunFile(args[0], errorReporter);
-                if (errorReporter.HadError)
+                if (errorReporter.HadCompilerError)
                     return 65;
+                else if (errorReporter.HadRuntimeError)
+                    return 70;
                 else
                     return 0;
             }
@@ -53,13 +56,18 @@
             Parser parser = new Parser(tokens, errorReporter);
             Expression? expression = parser.Parse();
 
-            if (errorReporter.HadError || expression == null)
+            if (errorReporter.HadCompilerError || expression == null)
             {
-                errorReporter.Display(Console.Error);
+                errorReporter.Display(Console.Error, ErrorType.Compiler);
                 return;
             }
 
-            Console.WriteLine(new AstPrinter().print(expression));
+            //Print the AST
+            //Console.WriteLine(new AstPrinter().print(expression));
+
+            interpreter.Interpret(expression, errorReporter);
+            if (errorReporter.HadRuntimeError)
+                errorReporter.Display(Console.Error, ErrorType.Runtime);
         }
     }
 }
