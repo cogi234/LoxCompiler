@@ -32,6 +32,7 @@
         {
             StreamReader reader = new StreamReader(path);
             Run(reader.ReadToEnd(), errorReporter);
+            Console.ReadLine();
         }
 
         static void RunPrompt()

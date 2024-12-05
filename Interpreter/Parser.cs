@@ -26,9 +26,6 @@
         }
 
         #region Statement Grammar
-        /// <summary>
-        /// declaration -> variableDeclaration | statement ;
-        /// </summary>
         private Statement? Declaration()
         {
             try
@@ -42,9 +39,6 @@
                 return null;
             }
         }
-        /// <summary>
-        /// declaration -> variableDeclaration | statement ;
-        /// </summary>
         private Statement VariableDeclaration()
         {
             Token varToken = Previous();
@@ -58,28 +52,37 @@
 
             return new Statement.VariableDeclaration(varToken, name, initializer);
         }
-        /// <summary>
-        /// statement -> expressionStatement | printStatement ;
-        /// </summary>
         private Statement Statement()
         {
             if (Match(TokenType.PrintKeyword))
                 return PrintStatement();
+            if (Match(TokenType.LeftBrace))
+                return Block();
 
             return ExpressionStatement();
         }
-        /// <summary>
-        /// expressionStatement -> expression ";" ;
-        /// </summary>
         private Statement ExpressionStatement()
         {
             Expression expression = Expression();
             Consume(TokenType.Semicolon, "Expected ';' after expression.");
             return new Statement.ExpressionStatement(expression);
         }
-        /// <summary>
-        /// printStatement -> "print" expression ";" ;
-        /// </summary>
+        private Statement Block()
+        {
+            List<Statement> statements = new List<Statement>();
+            Token opening = Previous();
+
+            while (!Check(TokenType.RightBrace) && !IsAtEnd())
+            {
+                Statement? statement = Declaration();
+                if (statement != null)
+                    statements.Add(statement);
+            }
+
+            Token closing = Consume(TokenType.RightBrace, "Expected '}' after block.");
+
+            return new Statement.Block(opening, statements, closing);
+        }
         private Statement PrintStatement()
         {
             Expression expression = Expression();

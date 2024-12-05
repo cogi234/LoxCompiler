@@ -18,8 +18,9 @@ namespace Interpreter
         #region Visitor Pattern
         internal interface IVisitor<T>
         {
-            T visit(VariableDeclaration statement);
             T visit(ExpressionStatement statement);
+            T visit(VariableDeclaration statement);
+            T visit(Block statement);
             T visit(Print statement);
         }
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -50,6 +51,23 @@ namespace Interpreter
             {
                 Name = name;
                 Initializer = initializer;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.visit(this);
+            }
+        }
+        internal class Block : Statement
+        {
+            public Token Opening { get; }
+            public List<Statement> Statements { get; }
+            public Token Closing { get; }
+
+            public Block(Token opening, List<Statement> statements, Token closing)
+                : base(TextSpan.FromBounds(opening.Span.Start, closing.Span.End))
+            {
+                Statements = statements;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

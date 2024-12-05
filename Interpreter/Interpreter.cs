@@ -30,6 +30,20 @@ namespace Interpreter
         {
             statement.accept(this);
         }
+        private void ExecuteBlock(List<Statement> statements, Environment environment)
+        {
+            Environment previous = this.environment;
+            try
+            {
+                this.environment = environment;
+
+                foreach (Statement statement in statements)
+                    Execute(statement);
+            } finally
+            {
+                this.environment = previous;
+            }
+        }
 
         #region Statement Visitor
         public object? visit(Statement.VariableDeclaration statement)
@@ -45,6 +59,11 @@ namespace Interpreter
         public object? visit(Statement.ExpressionStatement statement)
         {
             Evaluate(statement.Expression);
+            return null;
+        }
+        public object? visit(Statement.Block statement)
+        {
+            ExecuteBlock(statement.Statements, new Environment(environment));
             return null;
         }
         public object? visit(Statement.Print statement)
