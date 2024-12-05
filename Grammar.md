@@ -13,7 +13,9 @@ statement -> expressionStatement | printStatement ;
 expressionStatement -> expression ";" ;
 printStatement -> "print" expression ";" ;
 ## Expressions
-expression -> equality ;
+expression -> assignment ;
+assigment -> IDENTIFIER "=" assignment
+			| equality;
 equality -> comparison ( ( "!=" | "\=\=" ) comparison )\* ;
 comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )\* ;
 term -> factor ( ( "-" | "+" ) factor )\* ;

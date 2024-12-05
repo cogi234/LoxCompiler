@@ -89,17 +89,30 @@
         #endregion
 
         #region Expression Grammar
-        /// <summary>
-        /// expression -> equality
-        /// </summary>
         private Expression Expression()
         {
-            return Equality();
+            return Assignment();
         }
+        private Expression Assignment()
+        {
+            Expression expression = Equality();
 
-        /// <summary>
-        /// equality -> comparison ( ( "!=" | "==" ) comparison )* ;
-        /// </summary>
+            if (Match(TokenType.Equal))
+            {
+                Token equal = Previous();
+                Expression value = Assignment();
+
+                if (expression is Expression.Variable varExpr)
+                {
+                    Token name = varExpr.Name;
+                    return new Expression.Assignment(name, value);
+                }
+
+                Error(equal, "Invalid assignment target.");
+            }
+
+            return expression;
+        }
         private Expression Equality()
         {
             if (Match(TokenType.BangEqual, TokenType.EqualEqual))
@@ -119,10 +132,6 @@
 
             return expression;
         }
-
-        /// <summary>
-        /// comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-        /// </summary>
         private Expression Comparison()
         {
             if (Match(TokenType.Greater, TokenType.GreaterEqual, TokenType.Lesser, TokenType.LesserEqual))
@@ -142,10 +151,6 @@
 
             return expression;
         }
-
-        /// <summary>
-        /// term -> factor ( ( "-" | "+" ) factor )* ;
-        /// </summary>
         private Expression Term()
         {
             if (Match(TokenType.Plus))
@@ -165,10 +170,6 @@
 
             return expression;
         }
-
-        /// <summary>
-        /// factor -> unary ( ( "/" | "*" | "%" ) unary )* ;
-        /// </summary>
         private Expression Factor()
         {
             if (Match(TokenType.Slash, TokenType.Star, TokenType.Percent))
@@ -188,11 +189,6 @@
 
             return expression;
         }
-
-        /// <summary>
-        /// unary -> ( "!" | "-" ) unary 
-        ///         | primary ;
-        /// </summary>
         private Expression Unary()
         {
             if (Match(TokenType.Bang, TokenType.Minus))

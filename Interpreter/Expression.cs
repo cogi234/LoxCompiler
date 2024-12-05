@@ -11,6 +11,7 @@
         #region Visitor Pattern
         internal interface IVisitor<T>
         {
+            T visit(Assignment expression);
             T visit(Binary expression);
             T visit(Unary expression);
             T visit(Grouping expression);
@@ -21,6 +22,23 @@
         #endregion
 
         #region Expression classes
+        internal class Assignment : Expression
+        {
+            public Token Name { get; }
+            public Expression Value { get; }
+
+            public Assignment(Token name, Expression value) :
+                base(TextSpan.FromBounds(name.Span.Start, value.Span.End))
+            {
+                Name = name;
+                Value = value;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.visit(this);
+            }
+        }
         internal class Binary : Expression
         {
             public Expression Left { get; }

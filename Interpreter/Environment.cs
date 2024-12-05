@@ -15,6 +15,17 @@ namespace Interpreter
             values[name] = value;
         }
 
+        public void Assign(Token name, object? value)
+        {
+            if (values.ContainsKey(name.Lexeme))
+            {
+                values[name.Lexeme] = value;
+                return;
+            }
+
+            throw new Interpreter.RuntimeError(name, $"Undefined variable '${name.Lexeme}'.");
+        }
+
         public object? Get(Token name)
         {
             if (values.ContainsKey(name.Lexeme))

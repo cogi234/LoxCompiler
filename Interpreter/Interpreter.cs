@@ -56,6 +56,12 @@ namespace Interpreter
         #endregion
 
         #region Expression Visitor
+        public object? visit(Expression.Assignment expression)
+        {
+            object? value = Evaluate(expression.Value);
+            environment.Assign(expression.Name, value);
+            return value;
+        }
         public object? visit(Expression.Binary expression)
         {
             object? left = Evaluate(expression.Left);
