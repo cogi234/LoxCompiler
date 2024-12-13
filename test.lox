@@ -1,5 +1,6 @@
 var a = 1;
-{
-  var a = a + 2;
-  print a;
-}
+if (a == 1)
+	a = "It is true!";
+else
+	a = "I need a hero!";
+print a;

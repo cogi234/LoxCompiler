@@ -9,7 +9,8 @@ nonterminal -> "terminal" nonterminal LITERAL_TERMINAL ;
 program -> statement\* EOF ;
 declaration -> variableDeclaration | statement ;
 variableDeclaration -> "var" IDENTIFIER ( "=" expression )? ";" ; 
-statement -> expressionStatement | printStatement ;
+statement -> expressionStatement | printStatement | ifStatement | block ;
+ifStatement -> "if" "(" expression ")" statement ( "else" statement)? ;
 expressionStatement -> expression ";" ;
 printStatement -> "print" expression ";" ;
 ## Expressions

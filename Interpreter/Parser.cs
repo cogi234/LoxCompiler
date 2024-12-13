@@ -54,6 +54,8 @@
         }
         private Statement Statement()
         {
+            if (Match(TokenType.IfKeyword))
+                return IfStatement();
             if (Match(TokenType.PrintKeyword))
                 return PrintStatement();
             if (Match(TokenType.LeftBrace))
@@ -82,6 +84,19 @@
             Token closing = Consume(TokenType.RightBrace, "Expected '}' after block.");
 
             return new Statement.Block(opening, statements, closing);
+        }
+        private Statement IfStatement()
+        {
+            Token keyword = Previous();
+            Consume(TokenType.LeftParenthesis, "Expected '(' after 'if'.");
+            Expression condition = Expression();
+            Consume(TokenType.RightParenthesis, "Expected ')' after condition.");
+            Statement thenBranch = Statement();
+            Statement? elseBranch = null;
+            if (Match(TokenType.ElseKeyword))
+                elseBranch = Statement();
+
+            return new Statement.If(keyword, condition, thenBranch, elseBranch);
         }
         private Statement PrintStatement()
         {

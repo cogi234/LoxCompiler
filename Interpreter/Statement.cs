@@ -21,6 +21,7 @@ namespace Interpreter
             T visit(ExpressionStatement statement);
             T visit(VariableDeclaration statement);
             T visit(Block statement);
+            T visit(If statement);
             T visit(Print statement);
         }
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -60,14 +61,31 @@ namespace Interpreter
         }
         internal class Block : Statement
         {
-            public Token Opening { get; }
             public List<Statement> Statements { get; }
-            public Token Closing { get; }
 
             public Block(Token opening, List<Statement> statements, Token closing)
                 : base(TextSpan.FromBounds(opening.Span.Start, closing.Span.End))
             {
                 Statements = statements;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.visit(this);
+            }
+        }
+        internal class If : Statement
+        {
+            public Expression Condition { get; }
+            public Statement ThenBranch { get; }
+            public Statement? ElseBranch { get; }
+
+            public If(Token keyword, Expression condition, Statement thenBranch, Statement? elseBranch)
+                : base(TextSpan.FromBounds(keyword.Span.Start, (elseBranch ?? thenBranch).Span.End))
+            {
+                Condition = condition;
+                ThenBranch = thenBranch;
+                ElseBranch = elseBranch;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

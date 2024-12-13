@@ -66,6 +66,14 @@ namespace Interpreter
             ExecuteBlock(statement.Statements, new Environment(environment));
             return null;
         }
+        public object? visit(Statement.If statement)
+        {
+            if (GetBooleanValue(Evaluate(statement.Condition)))
+                Execute(statement.ThenBranch);
+            else if (statement.ElseBranch != null)
+                Execute(statement.ElseBranch);
+            return null;
+        }
         public object? visit(Statement.Print statement)
         {
             object? value = Evaluate(statement.Expression);
