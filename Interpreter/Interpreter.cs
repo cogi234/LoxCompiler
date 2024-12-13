@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,7 +21,8 @@ namespace Interpreter
                 {
                     Execute(statement);
                 }
-            } catch (RuntimeError error)
+            }
+            catch (RuntimeError error)
             {
                 errorReporter.Report(error.token.Span, error.Message, ErrorType.Runtime);
             }
@@ -39,7 +41,8 @@ namespace Interpreter
 
                 foreach (Statement statement in statements)
                     Execute(statement);
-            } finally
+            }
+            finally
             {
                 this.environment = previous;
             }
@@ -88,6 +91,23 @@ namespace Interpreter
             object? value = Evaluate(expression.Value);
             environment.Assign(expression.Name, value);
             return value;
+        }
+        public object? visit(Expression.Logical expression)
+        {
+            object? left = Evaluate(expression.Left);
+
+            if (expression.Operator.Type == TokenType.OrKeyword)
+            {
+                if (GetBooleanValue(left))
+                    return left;
+            }
+            else if (expression.Operator.Type == TokenType.AndKeyword)
+            {
+                if (!GetBooleanValue(left))
+                    return left;
+            }
+
+            return Evaluate(expression.Right);
         }
         public object? visit(Expression.Binary expression)
         {
@@ -205,7 +225,8 @@ namespace Interpreter
                 return;
             throw new RuntimeError(operatorToken, "Operand musts be numbers.");
         }
-        internal class RuntimeError : Exception {
+        internal class RuntimeError : Exception
+        {
             public readonly Token token;
 
             public RuntimeError(Token token, string message) : base(message)

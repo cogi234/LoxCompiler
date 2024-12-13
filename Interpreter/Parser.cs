@@ -113,7 +113,7 @@
         }
         private Expression Assignment()
         {
-            Expression expression = Equality();
+            Expression expression = Or();
 
             if (Match(TokenType.Equal))
             {
@@ -130,6 +130,32 @@
             }
 
             return expression;
+        }
+        private Expression Or()
+        {
+            Expression left = And();
+
+            while (Match(TokenType.OrKeyword))
+            {
+                Token op = Previous();
+                Expression right = And();
+                left = new Expression.Logical(left, op, right);
+            }
+
+            return left;
+        }
+        private Expression And()
+        {
+            Expression left = Equality();
+
+            while (Match(TokenType.AndKeyword))
+            {
+                Token op = Previous();
+                Expression right = Equality();
+                left = new Expression.Logical(left, op, right);
+            }
+
+            return left;
         }
         private Expression Equality()
         {

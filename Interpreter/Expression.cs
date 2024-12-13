@@ -12,6 +12,7 @@
         internal interface IVisitor<T>
         {
             T visit(Assignment expression);
+            T visit(Logical expression);
             T visit(Binary expression);
             T visit(Unary expression);
             T visit(Grouping expression);
@@ -46,6 +47,25 @@
             public Expression Right { get; }
 
             public Binary(Expression left, Token operatorToken, Expression right) :
+                base(TextSpan.FromBounds(left.Span.Start, right.Span.End))
+            {
+                Left = left;
+                Operator = operatorToken;
+                Right = right;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.visit(this);
+            }
+        }
+        internal class Logical : Expression
+        {
+            public Expression Left { get; }
+            public Token Operator { get; }
+            public Expression Right { get; }
+
+            public Logical(Expression left, Token operatorToken, Expression right) :
                 base(TextSpan.FromBounds(left.Span.Start, right.Span.End))
             {
                 Left = left;

@@ -16,7 +16,9 @@ printStatement -> "print" expression ";" ;
 ## Expressions
 expression -> assignment ;
 assigment -> IDENTIFIER "=" assignment
-			| equality;
+			| logicalOr;
+logicalOr -> logicalAnd ( "or" logicalAnd )* ;
+logicalOr -> equality ( "and" equality )* ;
 equality -> comparison ( ( "!=" | "\=\=" ) comparison )\* ;
 comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )\* ;
 term -> factor ( ( "-" | "+" ) factor )\* ;

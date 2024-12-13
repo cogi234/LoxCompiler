@@ -1,6 +1,2 @@
-var a = 1;
-if (a == 1)
-	a = "It is true!";
-else
-	a = "I need a hero!";
-print a;
+print "hi" or 2; // "hi".
+print nil or "yes"; // "yes".
