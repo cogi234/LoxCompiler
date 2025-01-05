@@ -12,6 +12,8 @@ namespace Interpreter
         private ErrorReporter errorReporter = new ErrorReporter();
         private Environment environment = new Environment();
 
+        private bool breakFlag = false;
+
         public void Interpret(List<Statement> statements, ErrorReporter errorReporter)
         {
             this.errorReporter = errorReporter;
@@ -79,9 +81,15 @@ namespace Interpreter
         }
         public object? visit(Statement.While statement)
         {
-            while (GetBooleanValue(Evaluate(statement.Condition)))
+            try
             {
-                Execute(statement.Body);
+                while (GetBooleanValue(Evaluate(statement.Condition)))
+                {
+                    Execute(statement.Body);
+                }
+            } catch (BreakException) 
+            {
+                return null;
             }
             return null;
         }
@@ -90,6 +98,10 @@ namespace Interpreter
             object? value = Evaluate(statement.Expression);
             Console.WriteLine(Stringify(value));
             return null;
+        }
+        public object? visit(Statement.Break statement)
+        {
+            throw new BreakException();
         }
         #endregion
 
@@ -242,6 +254,7 @@ namespace Interpreter
                 this.token = token;
             }
         }
+        internal class BreakException : Exception { }
         #endregion
     }
 }

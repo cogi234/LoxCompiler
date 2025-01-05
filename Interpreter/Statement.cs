@@ -24,6 +24,7 @@ namespace Interpreter
             T visit(If statement);
             T visit(While statement);
             T visit(Print statement);
+            T visit(Break statement);
         }
         public abstract T accept<T>(IVisitor<T> visitor);
         #endregion
@@ -116,10 +117,19 @@ namespace Interpreter
         {
             public Expression Expression { get; }
 
-            public Print(Expression expression) : base(expression.Span)
+            public Print(Token keyword, Expression expression) : base(TextSpan.FromBounds(keyword.Span.Start, expression.Span.End))
             {
                 Expression = expression;
             }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.visit(this);
+            }
+        }
+        internal class Break : Statement
+        {
+            public Break(Token keyword) : base(keyword.Span) { }
 
             public override T accept<T>(IVisitor<T> visitor)
             {

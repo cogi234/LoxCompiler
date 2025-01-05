@@ -6,6 +6,8 @@
         private readonly List<Token> tokens;
         private int current = 0;
 
+        private int loopCount = 0;
+
         public Parser(List<Token> tokens, ErrorReporter errorReporter)
         {
             this.tokens = tokens;
@@ -62,6 +64,8 @@
                 return ForStatement();
             if (Match(TokenType.PrintKeyword))
                 return PrintStatement();
+            if (Match(TokenType.BreakKeyword))
+                return BreakStatement();
             if (Match(TokenType.LeftBrace))
                 return Block();
 
@@ -108,7 +112,9 @@
             Consume(TokenType.LeftParenthesis, "Expected '(' after 'while'.");
             Expression condition = Expression();
             Consume(TokenType.RightParenthesis, "Expected ')' after condition.");
+            loopCount++;
             Statement body = Statement();
+            loopCount--;
 
             return new Statement.While(keyword, condition, body);
         }
@@ -135,7 +141,9 @@
                 increment = Expression();
             Consume(TokenType.RightParenthesis, "Expected ')' after for clauses.");
 
+            loopCount++;
             Statement body = Statement();
+            loopCount--;
 
             if (increment != null)
                 body = new Statement.Block(null, new List<Statement>([body, new Statement.ExpressionStatement(increment)]), null);
@@ -151,9 +159,18 @@
         }
         private Statement PrintStatement()
         {
+            Token keyword = Previous();
             Expression expression = Expression();
             Consume(TokenType.Semicolon, "Expected ';' after value.");
-            return new Statement.Print(expression);
+            return new Statement.Print(keyword, expression);
+        }
+        private Statement BreakStatement()
+        {
+            Token keyword = Previous();
+            if (loopCount == 0)
+                Error(keyword, "Can't break outside of a loop.");
+            Consume(TokenType.Semicolon, "Expected ';' after value.");
+            return new Statement.Break(keyword);
         }
         #endregion
 

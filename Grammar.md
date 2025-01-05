@@ -9,12 +9,13 @@ nonterminal -> "terminal" nonterminal LITERAL_TERMINAL ;
 program -> statement\* EOF ;
 declaration -> variableDeclaration | statement ;
 variableDeclaration -> "var" IDENTIFIER ( "=" expression )? ";" ; 
-statement -> expressionStatement | printStatement | ifStatement | whileStatement| forStatement | block ;
+statement -> expressionStatement | printStatement | breakStatement | ifStatement | whileStatement| forStatement | block ;
 forStatement -> "for" "(" ( variableDeclaration | expressionStatement | ";" ) expression? ";" expression? ")" statement ;
 whileStatement -> "while" "(" expression ")" statement;
 ifStatement -> "if" "(" expression ")" statement ( "else" statement)? ;
 expressionStatement -> expression ";" ;
 printStatement -> "print" expression ";" ;
+breakStatement -> "break" ";" ;
 ## Expressions
 expression -> assignment ;
 assigment -> IDENTIFIER "=" assignment
