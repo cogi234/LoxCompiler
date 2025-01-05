@@ -77,6 +77,14 @@ namespace Interpreter
                 Execute(statement.ElseBranch);
             return null;
         }
+        public object? visit(Statement.While statement)
+        {
+            while (GetBooleanValue(Evaluate(statement.Condition)))
+            {
+                Execute(statement.Body);
+            }
+            return null;
+        }
         public object? visit(Statement.Print statement)
         {
             object? value = Evaluate(statement.Expression);

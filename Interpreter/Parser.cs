@@ -56,6 +56,10 @@
         {
             if (Match(TokenType.IfKeyword))
                 return IfStatement();
+            if (Match(TokenType.WhileKeyword))
+                return WhileStatement();
+            if (Match(TokenType.ForKeyword))
+                return ForStatement();
             if (Match(TokenType.PrintKeyword))
                 return PrintStatement();
             if (Match(TokenType.LeftBrace))
@@ -97,6 +101,53 @@
                 elseBranch = Statement();
 
             return new Statement.If(keyword, condition, thenBranch, elseBranch);
+        }
+        private Statement WhileStatement()
+        {
+            Token keyword = Previous();
+            Consume(TokenType.LeftParenthesis, "Expected '(' after 'while'.");
+            Expression condition = Expression();
+            Consume(TokenType.RightParenthesis, "Expected ')' after condition.");
+            Statement body = Statement();
+
+            return new Statement.While(keyword, condition, body);
+        }
+        private Statement ForStatement()
+        {
+            Token keyword = Previous();
+            Consume(TokenType.LeftParenthesis, "Expected '(' after 'for'.");
+
+            Statement? initializer = null;
+            if (Match(TokenType.Semicolon))
+                initializer = null;
+            else if (Match(TokenType.VarKeyword))
+                initializer = VariableDeclaration();
+            else
+                initializer = ExpressionStatement();
+
+            Expression? condition = null;
+            if (!Check(TokenType.Semicolon))
+                condition = Expression();
+            Consume(TokenType.Semicolon, "Expected ';' after loop condition.");
+
+            Expression? increment = null;
+            if (!Check(TokenType.RightParenthesis))
+                increment = Expression();
+            Consume(TokenType.RightParenthesis, "Expected ')' after for clauses.");
+
+            Statement body = Statement();
+
+            if (increment != null)
+                body = new Statement.Block(null, new List<Statement>([body, new Statement.ExpressionStatement(increment)]), null);
+
+            if (condition == null)
+                condition = new Expression.Literal(new Token(TokenType.TrueKeyword, "true", keyword.Span, true));
+            body = new Statement.While(keyword, condition, body);
+
+            if (initializer != null)
+                body = new Statement.Block(null, new List<Statement>([initializer, body]), null);
+
+            return body;
         }
         private Statement PrintStatement()
         {
