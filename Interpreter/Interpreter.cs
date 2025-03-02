@@ -6,14 +6,15 @@ namespace Interpreter
     {
         private ErrorReporter errorReporter = new ErrorReporter();
 
-        private readonly Environment globals = new Environment();
+        public readonly Environment globals = new Environment();
         private Environment environment;
 
         public Interpreter()
         {
             environment = globals;
-            globals.Define("clock", new Clock());
-            globals.Define("print", new Print());
+            globals.Define("Clock", new Clock());
+            globals.Define("Print", new Print());
+            globals.Define("PrintLine", new PrintLine());
         }
 
         public void Interpret(List<Statement> statements, ErrorReporter errorReporter)
@@ -36,7 +37,7 @@ namespace Interpreter
         {
             statement.Accept(this);
         }
-        private void ExecuteBlock(List<Statement> statements, Environment environment)
+        public void ExecuteBlock(List<Statement> statements, Environment environment)
         {
             Environment previous = this.environment;
             try
@@ -61,6 +62,12 @@ namespace Interpreter
 
             environment.Define(statement.Name.Lexeme, value);
 
+            return null;
+        }
+        public object? Visit(Statement.Function statement)
+        {
+            Function function = new Function(statement);
+            environment.Define(statement.Name.Lexeme, function);
             return null;
         }
         public object? Visit(Statement.ExpressionStatement statement)

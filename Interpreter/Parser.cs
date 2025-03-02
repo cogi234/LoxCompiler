@@ -36,6 +36,8 @@
             {
                 if (Match(TokenType.VarKeyword))
                     return VariableDeclaration();
+                if (Match(TokenType.FnKeyword))
+                    return Function("function");
                 return Statement();
             }
             catch (ParseError error)
@@ -44,7 +46,7 @@
                 return null;
             }
         }
-        private Statement VariableDeclaration()
+        private Statement.VariableDeclaration VariableDeclaration()
         {
             Token varToken = Previous();
             Token name = Consume(TokenType.Identifier, "Expected a variable name.");
@@ -58,6 +60,28 @@
             Consume(TokenType.Semicolon, "Expected ';' after variable declaration.");
 
             return new Statement.VariableDeclaration(varToken, name, initializer);
+        }
+        private Statement.Function Function(string kind)
+        {
+            Token name = Consume(TokenType.Identifier, $"Expected {kind} name.");
+            Consume(TokenType.LeftParenthesis, $"Expected '(' after {kind} name.");
+            List<Token> parameters = new List<Token>();
+            if (!Check(TokenType.RightParenthesis))
+            {
+                do
+                {
+                    if (parameters.Count >= MAX_ARGUMENTS)
+                    {
+                        Error(Peek(), $"Can't have more than {MAX_ARGUMENTS} parameters.");
+                    }
+                    parameters.Add(Consume(TokenType.Identifier, "Expected parameter name."));
+                } while (Match(TokenType.Comma)); 
+            }
+            Consume(TokenType.RightParenthesis, "Expected ')' after parameters.");
+            Consume(TokenType.LeftBrace, $"Expected '{{' before {kind} body.");
+            Statement.Block block = Block();
+
+            return new Statement.Function(name, parameters, block);
         }
         private Statement Statement()
         {
@@ -74,13 +98,13 @@
 
             return ExpressionStatement();
         }
-        private Statement ExpressionStatement()
+        private Statement.ExpressionStatement ExpressionStatement()
         {
             Expression expression = Expression();
             Consume(TokenType.Semicolon, "Expected ';' after expression.");
             return new Statement.ExpressionStatement(expression);
         }
-        private Statement Block()
+        private Statement.Block Block()
         {
             List<Statement> statements = new List<Statement>();
             Token opening = Previous();
@@ -96,7 +120,7 @@
 
             return new Statement.Block(opening, statements, closing);
         }
-        private Statement IfStatement()
+        private Statement.If IfStatement()
         {
             Token keyword = Previous();
             Consume(TokenType.LeftParenthesis, "Expected '(' after 'if'.");
@@ -111,7 +135,7 @@
 
             return new Statement.If(keyword, condition, thenBranch, elseBranch);
         }
-        private Statement WhileStatement()
+        private Statement.While WhileStatement()
         {
             Token keyword = Previous();
             Consume(TokenType.LeftParenthesis, "Expected '(' after 'while'.");
@@ -162,7 +186,7 @@
 
             return body;
         }
-        private Statement BreakStatement()
+        private Statement.Break BreakStatement()
         {
             Token keyword = Previous();
             if (loopCount == 0)
@@ -338,7 +362,7 @@
                 {
                     if (arguments.Count >= MAX_ARGUMENTS)
                     {
-                        Error(Peek(), "Can't have more than 255 arguments.");
+                        Error(Peek(), $"Can't have more than {MAX_ARGUMENTS} arguments.");
                     }
                     arguments.Add(Expression());
                 } while (Match(TokenType.Comma));

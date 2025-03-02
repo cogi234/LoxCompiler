@@ -35,5 +35,6 @@ unary      -> ( "!" | "-" ) unary
               | primary ;
 call       -> primary ( "(" arguments? ")" )* ;
 arguments  -> expression ( "," expression )* ;
+parameters -> IDENTIFIER ( "," IDENTIFIER )* ;
 primary    -> INTEGER | FLOAT | STRING | "true" | "false" | "nil" | ( "("                        expression ")" ) | IDENTIFIER ;
 ```
