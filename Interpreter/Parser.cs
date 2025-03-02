@@ -37,7 +37,8 @@
                 if (Match(TokenType.VarKeyword))
                     return VariableDeclaration();
                 return Statement();
-            } catch (ParseError error)
+            }
+            catch (ParseError error)
             {
                 Synchronize();
                 return null;
@@ -365,7 +366,7 @@
                 TokenType.FalseKeyword,
                 TokenType.TrueKeyword,
                 TokenType.NilKeyword
-                )) 
+                ))
                 return new Expression.Literal(Previous());
 
             //Variable expression

@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace Interpreter
+﻿namespace Interpreter
 {
     internal class ErrorReporter
     {
@@ -13,7 +11,8 @@ namespace Interpreter
                 return error.Type == ErrorType.Compiler;
             });
         }
-        public bool HadRuntimeError {
+        public bool HadRuntimeError
+        {
             get => errors.Any((Error error) =>
             {
                 return error.Type == ErrorType.Runtime;

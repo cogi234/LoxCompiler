@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Interpreter.NativeFunctions;
 
 namespace Interpreter
 {
     internal class Interpreter : Expression.IVisitor<object?>, Statement.IVisitor<object?>/*Can't put void here in C#*/
     {
         private ErrorReporter errorReporter = new ErrorReporter();
-        private Environment environment = new Environment();
 
-        private bool breakFlag = false;
+        private readonly Environment globals = new Environment();
+        private Environment environment;
+
+        public Interpreter()
+        {
+            environment = globals;
+            globals.Define("clock", new Clock());
+            globals.Define("print", new Print());
+        }
 
         public void Interpret(List<Statement> statements, ErrorReporter errorReporter)
         {
@@ -88,7 +89,8 @@ namespace Interpreter
                 {
                     Execute(statement.Body);
                 }
-            } catch (BreakException) 
+            }
+            catch (BreakException)
             {
                 return null;
             }
@@ -192,7 +194,7 @@ namespace Interpreter
             object? callee = Evaluate(expression.Callee);
 
             List<object?> arguments = new List<object?>();
-            foreach (var argument in expression.Arguments)
+            foreach (Expression argument in expression.Arguments)
             {
                 arguments.Add(Evaluate(argument));
             }

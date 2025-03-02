@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Interpreter.Expression;
-
-namespace Interpreter
+﻿namespace Interpreter
 {
     internal abstract class Statement
     {
@@ -107,7 +100,7 @@ namespace Interpreter
             public Statement Body { get; }
 
             public While(Token keyword, Expression condition, Statement body)
-                :base(TextSpan.FromBounds(keyword.Span.Start, body.Span.End))
+                : base(TextSpan.FromBounds(keyword.Span.Start, body.Span.End))
             {
                 Keyword = keyword;
                 Condition = condition;
