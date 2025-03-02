@@ -11,33 +11,36 @@
         #region Visitor Pattern
         internal interface IVisitor<T>
         {
-            T visit(Assignment expression);
-            T visit(Logical expression);
-            T visit(Binary expression);
-            T visit(Unary expression);
-            T visit(Grouping expression);
-            T visit(Literal expression);
-            T visit(Variable expression);
+            T Visit(Assignment expression);
+            T Visit(Logical expression);
+            T Visit(Binary expression);
+            T Visit(Unary expression);
+            T Visit(Call expression);
+            T Visit(Grouping expression);
+            T Visit(Literal expression);
+            T Visit(Variable expression);
         }
-        public abstract T accept<T>(IVisitor<T> visitor);
+        public abstract T Accept<T>(IVisitor<T> visitor);
         #endregion
 
         #region Expression classes
         internal class Assignment : Expression
         {
             public Token Name { get; }
+            public Token Operator { get; }
             public Expression Value { get; }
 
-            public Assignment(Token name, Expression value) :
+            public Assignment(Token name, Token operatorToken, Expression value) :
                 base(TextSpan.FromBounds(name.Span.Start, value.Span.End))
             {
                 Name = name;
+                Operator = operatorToken;
                 Value = value;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class Binary : Expression
@@ -54,9 +57,9 @@
                 Right = right;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class Logical : Expression
@@ -73,9 +76,9 @@
                 Right = right;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class Unary : Expression
@@ -90,24 +93,49 @@
                 Expression = expression;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
+            }
+        }
+        internal class Call : Expression
+        {
+            public Expression Callee { get; }
+            public Token LeftParenthesis { get; }
+            public List<Expression> Arguments { get; }
+            public Token RightParenthesis { get; }
+
+            public Call(Expression callee, Token leftParenthesis, List<Expression> arguments, Token rightParenthesis) :
+                base(TextSpan.FromBounds(callee.Span.Start, rightParenthesis.Span.End))
+            {
+                Callee = callee;
+                LeftParenthesis = leftParenthesis;
+                Arguments = arguments;
+                RightParenthesis = rightParenthesis;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
             }
         }
         internal class Grouping : Expression
         {
+            public Token LeftParenthesis { get; }
             public Expression Expression { get; }
+            public Token RightParenthesis { get; }
 
             public Grouping(Token leftParenthesis, Expression expression, Token rightParenthesis) :
                 base(TextSpan.FromBounds(leftParenthesis.Span.Start, rightParenthesis.Span.End))
             {
+                LeftParenthesis = leftParenthesis;
                 Expression = expression;
+                RightParenthesis = rightParenthesis;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class Literal : Expression
@@ -119,9 +147,9 @@
                 LiteralToken = literalToken;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class Variable : Expression
@@ -133,9 +161,9 @@
                 Name = name;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         #endregion

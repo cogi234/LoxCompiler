@@ -2,6 +2,8 @@
 {
     internal class Parser
     {
+        private const int MAX_ARGUMENTS = 255;
+
         private readonly ErrorReporter errorReporter;
         private readonly List<Token> tokens;
         private int current = 0;
@@ -48,7 +50,9 @@
 
             Expression? initializer = null;
             if (Match(TokenType.Equal))
+            {
                 initializer = Expression();
+            }
 
             Consume(TokenType.Semicolon, "Expected ';' after variable declaration.");
 
@@ -102,7 +106,9 @@
             Statement thenBranch = Statement();
             Statement? elseBranch = null;
             if (Match(TokenType.ElseKeyword))
+            {
                 elseBranch = Statement();
+            }
 
             return new Statement.If(keyword, condition, thenBranch, elseBranch);
         }
@@ -191,7 +197,7 @@
                 if (expression is Expression.Variable varExpr)
                 {
                     Token name = varExpr.Name;
-                    return new Expression.Assignment(name, value);
+                    return new Expression.Assignment(name, equal, value);
                 }
 
                 Error(equal, "Invalid assignment target.");
@@ -310,9 +316,46 @@
                 return new Expression.Unary(operatorToken, right);
             }
 
-            return Primary();
+            return Call();
         }
+        private Expression Call()
+        {
+            Expression expression = Primary();
 
+            while (true)
+            {
+                if (Match(TokenType.LeftParenthesis))
+                {
+                    expression = FinishCall(expression);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return expression;
+        }
+        private Expression FinishCall(Expression callee)
+        {
+            Token leftParenthesis = Previous();
+            List<Expression> arguments = new List<Expression>();
+            if (!Check(TokenType.RightParenthesis))
+            {
+                do
+                {
+                    if (arguments.Count >= MAX_ARGUMENTS)
+                    {
+                        Error(Peek(), "Can't have more than 255 arguments.");
+                    }
+                    arguments.Add(Expression());
+                } while (Match(TokenType.Comma));
+            }
+
+            Token rightParenthesis = Consume(TokenType.RightParenthesis, "Expected ')' after arguments.");
+
+            return new Expression.Call(callee, leftParenthesis, arguments, rightParenthesis);
+        }
         private Expression Primary()
         {
             // Literals

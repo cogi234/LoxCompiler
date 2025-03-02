@@ -18,15 +18,15 @@ namespace Interpreter
         #region Visitor Pattern
         internal interface IVisitor<T>
         {
-            T visit(ExpressionStatement statement);
-            T visit(VariableDeclaration statement);
-            T visit(Block statement);
-            T visit(If statement);
-            T visit(While statement);
-            T visit(Print statement);
-            T visit(Break statement);
+            T Visit(ExpressionStatement statement);
+            T Visit(VariableDeclaration statement);
+            T Visit(Block statement);
+            T Visit(If statement);
+            T Visit(While statement);
+            T Visit(Print statement);
+            T Visit(Break statement);
         }
-        public abstract T accept<T>(IVisitor<T> visitor);
+        public abstract T Accept<T>(IVisitor<T> visitor);
         #endregion
 
         #region Statement classes
@@ -39,26 +39,28 @@ namespace Interpreter
                 Expression = expression;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class VariableDeclaration : Statement
         {
+            public Token Keyword { get; }
             public Token Name { get; }
             public Expression? Initializer { get; }
 
-            public VariableDeclaration(Token varToken, Token name, Expression? initializer)
-                : base(TextSpan.FromBounds(varToken.Span.Start, initializer == null ? name.Span.End : initializer.Span.End))
+            public VariableDeclaration(Token keyword, Token name, Expression? initializer)
+                : base(TextSpan.FromBounds(keyword.Span.Start, initializer == null ? name.Span.End : initializer.Span.End))
             {
+                Keyword = keyword;
                 Name = name;
                 Initializer = initializer;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class Block : Statement
@@ -67,18 +69,19 @@ namespace Interpreter
 
             public Block(Token? opening, List<Statement> statements, Token? closing)
                 : base(TextSpan.FromBounds(opening == null ? statements[0].Span.Start : opening.Span.Start,
-                    closing == null ? statements[statements.Count - 1].Span.End : closing.Span.End))
+                                           closing == null ? statements[statements.Count - 1].Span.End : closing.Span.End))
             {
                 Statements = statements;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class If : Statement
         {
+            public Token Keyword { get; }
             public Expression Condition { get; }
             public Statement ThenBranch { get; }
             public Statement? ElseBranch { get; }
@@ -86,54 +89,64 @@ namespace Interpreter
             public If(Token keyword, Expression condition, Statement thenBranch, Statement? elseBranch)
                 : base(TextSpan.FromBounds(keyword.Span.Start, (elseBranch ?? thenBranch).Span.End))
             {
+                Keyword = keyword;
                 Condition = condition;
                 ThenBranch = thenBranch;
                 ElseBranch = elseBranch;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class While : Statement
         {
+            public Token Keyword { get; }
             public Expression Condition { get; }
             public Statement Body { get; }
 
             public While(Token keyword, Expression condition, Statement body)
                 :base(TextSpan.FromBounds(keyword.Span.Start, body.Span.End))
             {
+                Keyword = keyword;
                 Condition = condition;
                 Body = body;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class Print : Statement
         {
+            public Token Keyword { get; }
             public Expression Expression { get; }
 
             public Print(Token keyword, Expression expression) : base(TextSpan.FromBounds(keyword.Span.Start, expression.Span.End))
             {
+                Keyword = keyword;
                 Expression = expression;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
-                return visitor.visit(this);
+                return visitor.Visit(this);
             }
         }
         internal class Break : Statement
         {
-            public Break(Token keyword) : base(keyword.Span) { }
+            public Token Keyword { get; }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public Break(Token keyword) : base(keyword.Span)
             {
-                return visitor.visit(this);
+                Keyword = keyword;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
             }
         }
         #endregion

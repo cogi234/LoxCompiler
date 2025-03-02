@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -32,7 +33,7 @@ namespace Interpreter
 
         private void Execute(Statement statement)
         {
-            statement.accept(this);
+            statement.Accept(this);
         }
         private void ExecuteBlock(List<Statement> statements, Environment environment)
         {
@@ -51,7 +52,7 @@ namespace Interpreter
         }
 
         #region Statement Visitor
-        public object? visit(Statement.VariableDeclaration statement)
+        public object? Visit(Statement.VariableDeclaration statement)
         {
             object? value = null;
             if (statement.Initializer != null)
@@ -61,17 +62,17 @@ namespace Interpreter
 
             return null;
         }
-        public object? visit(Statement.ExpressionStatement statement)
+        public object? Visit(Statement.ExpressionStatement statement)
         {
             Evaluate(statement.Expression);
             return null;
         }
-        public object? visit(Statement.Block statement)
+        public object? Visit(Statement.Block statement)
         {
             ExecuteBlock(statement.Statements, new Environment(environment));
             return null;
         }
-        public object? visit(Statement.If statement)
+        public object? Visit(Statement.If statement)
         {
             if (GetBooleanValue(Evaluate(statement.Condition)))
                 Execute(statement.ThenBranch);
@@ -79,7 +80,7 @@ namespace Interpreter
                 Execute(statement.ElseBranch);
             return null;
         }
-        public object? visit(Statement.While statement)
+        public object? Visit(Statement.While statement)
         {
             try
             {
@@ -93,26 +94,26 @@ namespace Interpreter
             }
             return null;
         }
-        public object? visit(Statement.Print statement)
+        public object? Visit(Statement.Print statement)
         {
             object? value = Evaluate(statement.Expression);
             Console.WriteLine(Stringify(value));
             return null;
         }
-        public object? visit(Statement.Break statement)
+        public object? Visit(Statement.Break statement)
         {
             throw new BreakException();
         }
         #endregion
 
         #region Expression Visitor
-        public object? visit(Expression.Assignment expression)
+        public object? Visit(Expression.Assignment expression)
         {
             object? value = Evaluate(expression.Value);
             environment.Assign(expression.Name, value);
             return value;
         }
-        public object? visit(Expression.Logical expression)
+        public object? Visit(Expression.Logical expression)
         {
             object? left = Evaluate(expression.Left);
 
@@ -129,7 +130,7 @@ namespace Interpreter
 
             return Evaluate(expression.Right);
         }
-        public object? visit(Expression.Binary expression)
+        public object? Visit(Expression.Binary expression)
         {
             object? left = Evaluate(expression.Left);
             object? right = Evaluate(expression.Right);
@@ -171,7 +172,7 @@ namespace Interpreter
 
             return null;
         }
-        public object? visit(Expression.Unary expression)
+        public object? Visit(Expression.Unary expression)
         {
             object? right = Evaluate(expression.Expression);
 
@@ -186,15 +187,38 @@ namespace Interpreter
 
             return null;
         }
-        public object? visit(Expression.Grouping expression)
+        public object? Visit(Expression.Call expression)
+        {
+            object? callee = Evaluate(expression.Callee);
+
+            List<object?> arguments = new List<object?>();
+            foreach (var argument in expression.Arguments)
+            {
+                arguments.Add(Evaluate(argument));
+            }
+
+            if (!(callee is ICallable))
+            {
+                throw new RuntimeError(expression.LeftParenthesis, "Can only call functions");
+            }
+
+            ICallable function = (ICallable)callee;
+            if (arguments.Count != function.Arity())
+            {
+                throw new RuntimeError(expression.LeftParenthesis, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
+            }
+
+            return function.Call(this, arguments);
+        }
+        public object? Visit(Expression.Grouping expression)
         {
             return Evaluate(expression.Expression);
         }
-        public object? visit(Expression.Literal expression)
+        public object? Visit(Expression.Literal expression)
         {
             return expression.LiteralToken.Literal;
         }
-        public object? visit(Expression.Variable expression)
+        public object? Visit(Expression.Variable expression)
         {
             return environment.Get(expression.Name);
         }
@@ -203,7 +227,7 @@ namespace Interpreter
         #region Helpers
         private object? Evaluate(Expression expression)
         {
-            return expression.accept(this);
+            return expression.Accept(this);
         }
         /// <summary>
         /// Only nil and false are false. Everything else is true
@@ -243,7 +267,7 @@ namespace Interpreter
             if (left != null && left.GetType() == typeof(double)
                 && right != null && right.GetType() == typeof(double))
                 return;
-            throw new RuntimeError(operatorToken, "Operand musts be numbers.");
+            throw new RuntimeError(operatorToken, "Operands must be numbers.");
         }
         internal class RuntimeError : Exception
         {
