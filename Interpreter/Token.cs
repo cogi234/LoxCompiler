@@ -44,7 +44,7 @@
         IfKeyword, ElseKeyword,
         WhileKeyword, ForKeyword, BreakKeyword,
         ClassKeyword, NewKeyword, ThisKeyword,
-        FunctionKeyword, PrintKeyword, SuperKeyword, ReturnKeyword,
+        FnKeyword, SuperKeyword, ReturnKeyword,
         VarKeyword, NilKeyword,
 
         // Misc

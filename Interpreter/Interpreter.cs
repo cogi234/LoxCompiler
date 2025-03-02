@@ -96,12 +96,6 @@ namespace Interpreter
             }
             return null;
         }
-        public object? Visit(Statement.Print statement)
-        {
-            object? value = Evaluate(statement.Expression);
-            Console.WriteLine(Stringify(value));
-            return null;
-        }
         public object? Visit(Statement.Break statement)
         {
             throw new BreakException();

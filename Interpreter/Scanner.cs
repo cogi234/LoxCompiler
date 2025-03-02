@@ -23,8 +23,7 @@ namespace Interpreter
             { "new", TokenType.NewKeyword },
             { "this", TokenType.ThisKeyword },
 
-            { "function", TokenType.FunctionKeyword },
-            { "print", TokenType.PrintKeyword },
+            { "fn", TokenType.FnKeyword },
             { "super", TokenType.SuperKeyword },
             { "return", TokenType.ReturnKeyword },
 

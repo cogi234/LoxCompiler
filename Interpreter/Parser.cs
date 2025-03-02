@@ -67,8 +67,6 @@
                 return WhileStatement();
             if (Match(TokenType.ForKeyword))
                 return ForStatement();
-            if (Match(TokenType.PrintKeyword))
-                return PrintStatement();
             if (Match(TokenType.BreakKeyword))
                 return BreakStatement();
             if (Match(TokenType.LeftBrace))
@@ -163,13 +161,6 @@
                 body = new Statement.Block(null, new List<Statement>([initializer, body]), null);
 
             return body;
-        }
-        private Statement PrintStatement()
-        {
-            Token keyword = Previous();
-            Expression expression = Expression();
-            Consume(TokenType.Semicolon, "Expected ';' after value.");
-            return new Statement.Print(keyword, expression);
         }
         private Statement BreakStatement()
         {
@@ -436,13 +427,12 @@
                 switch (Peek().Type)
                 {
                     case TokenType.ClassKeyword:
-                    case TokenType.FunctionKeyword:
+                    case TokenType.FnKeyword:
                     case TokenType.IfKeyword:
                     case TokenType.ForKeyword:
                     case TokenType.WhileKeyword:
                     case TokenType.VarKeyword:
                     case TokenType.ReturnKeyword:
-                    case TokenType.PrintKeyword:
                         return;
                 }
 
