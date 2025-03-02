@@ -7,8 +7,12 @@ for (var b = 1; a < 10000; b = temp + b) {
 	a = b;
 }
 
-fn SayHi(firstName, lastName) {
-	PrintLine("Hi, " + firstName + " " + lastName + "!");
+fn Fibbonacci(n) {
+	if (n <= 1)
+		return n;
+	return Fibbonacci(n - 2) + Fibbonacci(n - 1);
 }
 
-SayHi("Dear", "Reader");
+for (var i = 0; i < 10; i = i + 1) {
+	PrintLine(Fibbonacci(i));
+}

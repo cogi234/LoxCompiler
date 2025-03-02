@@ -17,6 +17,7 @@
             T Visit(Block statement);
             T Visit(If statement);
             T Visit(While statement);
+            T Visit(Return statement);
             T Visit(Break statement);
         }
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -124,6 +125,23 @@
                 Keyword = keyword;
                 Condition = condition;
                 Body = body;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+        internal class Return : Statement
+        {
+            public Token Keyword { get; }
+            public Expression? Expression { get; }
+
+            public Return(Token keyword, Expression? expression) : base(expression == null ? keyword.Span
+                                                                                           : TextSpan.FromBounds(keyword.Span.Start, expression.Span.End))
+            {
+                Keyword = keyword;
+                Expression = expression;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)

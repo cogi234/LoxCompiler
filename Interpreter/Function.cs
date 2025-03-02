@@ -27,7 +27,13 @@ namespace Interpreter
                 environment.Define(parameter.Lexeme, arguments[i]);
             }
 
-            interpreter.ExecuteBlock(declaration.Body.Statements, environment);
+            try
+            {
+                interpreter.ExecuteBlock(declaration.Body.Statements, environment);
+            } catch (Interpreter.ReturnException ex)
+            {
+                return ex.Value;
+            }
             return null;
         }
 

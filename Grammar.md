@@ -12,13 +12,14 @@ declaration         -> variableDeclaration | functionDeclaration | statement ;
 variableDeclaration -> "var" IDENTIFIER ( "=" expression )? ";" ;
 functionDeclaration -> "fn" function ;
 function            -> IDENTIFIER "(" parameters? ")" block ;
-statement           -> expressionStatement | printStatement | breakStatement |                            ifStatement | whileStatement| forStatement | block ;
+statement           -> expressionStatement | printStatement | breakStatement |                            ifStatement | whileStatement| forStatement | block |                               returnStatement ;
 forStatement        -> "for" "(" ( variableDeclaration | expressionStatement | ";"                                   ) expression? ";" expression? ")" statement ;
 whileStatement      -> "while" "(" expression ")" statement;
 ifStatement         -> "if" "(" expression ")" statement ( "else" statement)? ;
 expressionStatement -> expression ";" ;
-printStatement      -> "print" expression ";" ;
+returnStatement     -> "return" expression? ";" ;
 breakStatement      -> "break" ";" ;
+
 ```
 ## Expressions
 ```

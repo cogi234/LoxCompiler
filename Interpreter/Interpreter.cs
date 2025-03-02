@@ -103,6 +103,14 @@ namespace Interpreter
             }
             return null;
         }
+        public object? Visit(Statement.Return statement)
+        {
+            object? value = null;
+            if (statement.Expression != null)
+                value = Evaluate(statement.Expression);
+
+            throw new ReturnException(value);
+        }
         public object? Visit(Statement.Break statement)
         {
             throw new BreakException();
@@ -281,7 +289,16 @@ namespace Interpreter
                 this.token = token;
             }
         }
-        internal class BreakException : Exception { }
         #endregion
+        internal class BreakException : Exception { }
+        internal class ReturnException : Exception
+        {
+            public object? Value { get; }
+            public ReturnException(object? value)
+            {
+                Value = value;
+
+            }
+        }
     }
 }

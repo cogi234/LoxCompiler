@@ -93,6 +93,8 @@
                 return ForStatement();
             if (Match(TokenType.BreakKeyword))
                 return BreakStatement();
+            if (Match(TokenType.ReturnKeyword))
+                return ReturnStatement();
             if (Match(TokenType.LeftBrace))
                 return Block();
 
@@ -185,6 +187,17 @@
                 body = new Statement.Block(null, new List<Statement>([initializer, body]), null);
 
             return body;
+        }
+        private Statement.Return ReturnStatement()
+        {
+            Token keyword = Previous();
+            Expression? expression = null;
+            if (!Check(TokenType.Semicolon))
+            {
+                expression = Expression();
+            }
+            Consume(TokenType.Semicolon, "Expected ';' after return value.");
+            return new Statement.Return(keyword, expression);
         }
         private Statement.Break BreakStatement()
         {
