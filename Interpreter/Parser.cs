@@ -63,6 +63,7 @@
         }
         private Statement.Function Function(string kind)
         {
+            Token keyword = Previous();
             Token name = Consume(TokenType.Identifier, $"Expected {kind} name.");
             Consume(TokenType.LeftParenthesis, $"Expected '(' after {kind} name.");
             List<Token> parameters = new List<Token>();
@@ -75,13 +76,13 @@
                         Error(Peek(), $"Can't have more than {MAX_ARGUMENTS} parameters.");
                     }
                     parameters.Add(Consume(TokenType.Identifier, "Expected parameter name."));
-                } while (Match(TokenType.Comma)); 
+                } while (Match(TokenType.Comma));
             }
             Consume(TokenType.RightParenthesis, "Expected ')' after parameters.");
             Consume(TokenType.LeftBrace, $"Expected '{{' before {kind} body.");
             Statement.Block block = Block();
 
-            return new Statement.Function(name, parameters, block);
+            return new Statement.Function(keyword, name, parameters, block);
         }
         private Statement Statement()
         {
@@ -216,6 +217,11 @@
         }
         private Expression Assignment()
         {
+            if (Match(TokenType.FnKeyword))
+            {
+                return Lambda();
+            }
+
             Expression expression = Or();
 
             if (Match(TokenType.Equal))
@@ -233,6 +239,29 @@
             }
 
             return expression;
+        }
+        private Expression.Lambda Lambda()
+        {
+            Token keyword = Previous();
+            Consume(TokenType.LeftParenthesis, $"Expected '(' after fn keyword.");
+            List<Token> parameters = new List<Token>();
+            if (!Check(TokenType.RightParenthesis))
+            {
+                do
+                {
+                    if (parameters.Count >= MAX_ARGUMENTS)
+                    {
+                        Error(Peek(), $"Can't have more than {MAX_ARGUMENTS} parameters.");
+                    }
+                    parameters.Add(Consume(TokenType.Identifier, "Expected parameter name."));
+                } while (Match(TokenType.Comma));
+            }
+            Consume(TokenType.RightParenthesis, "Expected ')' after parameters.");
+            Consume(TokenType.LeftBrace, $"Expected '{{' before function body.");
+            Statement.Block block = Block();
+
+            return new Expression.Lambda(keyword, parameters, block);
+
         }
         private Expression Or()
         {

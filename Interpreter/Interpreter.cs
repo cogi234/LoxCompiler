@@ -66,8 +66,8 @@ namespace Interpreter
         }
         public object? Visit(Statement.Function statement)
         {
-            Function function = new Function(statement);
-            environment.Define(statement.Name.Lexeme, function);
+            Function function = new Function(statement, environment);
+            environment.Define(statement.NameToken.Lexeme, function);
             return null;
         }
         public object? Visit(Statement.ExpressionStatement statement)
@@ -123,6 +123,10 @@ namespace Interpreter
             object? value = Evaluate(expression.Value);
             environment.Assign(expression.Name, value);
             return value;
+        }
+        public object? Visit(Expression.Lambda expression)
+        {
+            return new Function(expression, environment);
         }
         public object? Visit(Expression.Logical expression)
         {

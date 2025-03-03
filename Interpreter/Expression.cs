@@ -1,4 +1,6 @@
-﻿namespace Interpreter
+﻿using static Interpreter.Statement;
+
+namespace Interpreter
 {
     internal abstract class Expression
     {
@@ -12,6 +14,7 @@
         internal interface IVisitor<T>
         {
             T Visit(Assignment expression);
+            T Visit(Lambda expression);
             T Visit(Logical expression);
             T Visit(Binary expression);
             T Visit(Unary expression);
@@ -36,6 +39,27 @@
                 Name = name;
                 Operator = operatorToken;
                 Value = value;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+        internal class Lambda : Expression, IFunctionDeclaration
+        {
+            public Token Keyword { get; }
+            public string Name => "lambda";
+            public List<Token> Parameters { get; }
+            public Block Body { get; }
+
+
+            public Lambda(Token keyword, List<Token> parameters, Block body)
+                : base(TextSpan.FromBounds(keyword.Span.Start, body.Span.End))
+            {
+                Keyword = keyword;
+                Parameters = parameters;
+                Body = body;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)

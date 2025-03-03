@@ -25,7 +25,8 @@ breakStatement      -> "break" ";" ;
 ```
 expression -> assignment ;
 assigment  -> IDENTIFIER "=" assignment
-              | logicalOr;
+              | logicalOr | lambda;
+lambda     -> "fn" "(" parameters? ")" block ;
 logicalOr  -> logicalAnd ( "or" logicalAnd )* ;
 logicalOr  -> equality ( "and" equality )* ;
 equality   -> comparison ( ( "!=" | "\=\=" ) comparison )\* ;

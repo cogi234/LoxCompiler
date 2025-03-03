@@ -57,16 +57,19 @@
                 return visitor.Visit(this);
             }
         }
-        internal class Function : Statement
+        internal class Function : Statement, IFunctionDeclaration
         {
-            public Token Name { get; }
+            Token Keyword { get; }
+            public string Name => NameToken.Lexeme;
+            public Token NameToken { get; }
             public List<Token> Parameters { get; }
             public Block Body { get; }
 
-            public Function(Token name, List<Token> parameters, Block body)
-                : base(TextSpan.FromBounds(name.Span.Start, body.Span.End))
+            public Function(Token keyword, Token name, List<Token> parameters, Block body)
+                : base(TextSpan.FromBounds(keyword.Span.Start, body.Span.End))
             {
-                Name = name;
+                Keyword = keyword;
+                NameToken = name;
                 Parameters = parameters;
                 Body = body;
             }

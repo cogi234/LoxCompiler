@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Interpreter
+﻿namespace Interpreter
 {
     internal class Function : ICallable
     {
-        private readonly Statement.Function declaration;
+        private readonly IFunctionDeclaration declaration;
+        private readonly Environment closure;
 
-        public Function(Statement.Function declaration)
+        public Function(IFunctionDeclaration declaration, Environment closure)
         {
             this.declaration = declaration;
+            this.closure = closure;
         }
 
         public int Arity() => declaration.Parameters.Count;
 
         public object? Call(Interpreter interpreter, List<object?> arguments)
         {
-            Environment environment = new Environment(interpreter.globals);
+            Environment environment = new Environment(closure);
 
             for (int i = 0; i < declaration.Parameters.Count; i++)
             {
@@ -30,13 +26,14 @@ namespace Interpreter
             try
             {
                 interpreter.ExecuteBlock(declaration.Body.Statements, environment);
-            } catch (Interpreter.ReturnException ex)
+            }
+            catch (Interpreter.ReturnException ex)
             {
                 return ex.Value;
             }
             return null;
         }
 
-        public override string? ToString() => $"<fn {declaration.Name.Lexeme}>";
+        public override string? ToString() => $"<fn {declaration.Name}>";
     }
 }
