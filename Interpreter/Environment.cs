@@ -39,10 +39,14 @@
         public object? Get(Token name)
         {
             if (values.ContainsKey(name.Lexeme))
+            {
                 return values[name.Lexeme];
+            }
 
             if (enclosing != null)
+            {
                 return enclosing.Get(name);
+            }
 
             throw new Interpreter.RuntimeError(name, $"Undefined variable '${name.Lexeme}'.");
         }

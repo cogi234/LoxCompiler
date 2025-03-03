@@ -4,20 +4,9 @@
     {
         List<Error> errors = new List<Error>();
 
-        public bool HadCompilerError
-        {
-            get => errors.Any((Error error) =>
-            {
-                return error.Type == ErrorType.Compiler;
-            });
-        }
-        public bool HadRuntimeError
-        {
-            get => errors.Any((Error error) =>
-            {
-                return error.Type == ErrorType.Runtime;
-            });
-        }
+        public bool HadCompilerError => errors.Any((Error error) => error.Type == ErrorType.Compiler);
+        public bool HadResolverError => errors.Any((Error error) => error.Type == ErrorType.Resolver);
+        public bool HadRuntimeError => errors.Any((Error error) => error.Type == ErrorType.Runtime);
 
         public void Report(TextSpan span, string message, ErrorType errorType)
         {
@@ -56,6 +45,7 @@
     internal enum ErrorType
     {
         Compiler,
-        Runtime
+        Resolver,
+        Runtime,
     }
 }

@@ -94,16 +94,23 @@ namespace Interpreter
                     {
                         // A line comment.
                         while (Peek() != '\n' && !IsAtEnd())
+                        {
                             Advance();
+                        }
                     }
                     else if (Match('*'))
                     {
                         // A multi-line comment.
                         while (!MatchTwo('*', '/') && !IsAtEnd())
+                        {
                             Advance();
+                        }
                     }
                     else
+                    {
                         AddToken(TokenType.Slash);
+                    }
+
                     break;
                 // Whitespace
                 case ' ':
@@ -115,11 +122,18 @@ namespace Interpreter
                 case '"': String(); break;
                 default:
                     if (IsDigit(c))
+                    {
                         Number();
+                    }
                     else if (IsAlpha(c))
+                    {
                         Identifier();
+                    }
                     else
+                    {
                         errorReporter.Report(new TextSpan(current, 1), "Unexpected character.", ErrorType.Compiler);
+                    }
+
                     break;
             }
         }
@@ -148,9 +162,13 @@ namespace Interpreter
                     }
                 }
                 else if (Peek() == '"' || IsAtEnd())
+                {
                     break;
+                }
                 else
+                {
                     sb.Append(Advance());
+                }
             }
 
             if (IsAtEnd())
@@ -169,14 +187,18 @@ namespace Interpreter
         {
             // Whole part
             while (IsDigit(Peek()))
+            {
                 Advance();
+            }
 
             // Fractionnal part
             if (Peek() == '.' && IsDigit(PeekNext()))
             {
                 Advance();// Consume the "."
                 while (IsDigit(Peek()))
+                {
                     Advance();
+                }
             }
 
             TextSpan span = TextSpan.FromBounds(start, current);
@@ -188,14 +210,20 @@ namespace Interpreter
         private void Identifier()
         {
             while (IsAlphaNumeric(Peek()))
+            {
                 Advance();
+            }
 
             TextSpan span = TextSpan.FromBounds(start, current);
             string text = source.Substring(span.Start, span.Length);
             if (keywords.ContainsKey(text))
+            {
                 AddToken(keywords[text]);
+            }
             else
+            {
                 AddToken(TokenType.Identifier);
+            }
         }
 
         #region Helper Methods
@@ -205,7 +233,9 @@ namespace Interpreter
         private bool Match(char expected)
         {
             if (Peek() != expected)
+            {
                 return false;
+            }
 
             current++;
             return true;
@@ -213,7 +243,9 @@ namespace Interpreter
         private bool MatchTwo(char first, char second)
         {
             if (Peek() != first || PeekNext() != second)
+            {
                 return false;
+            }
 
             current += 2;
             return true;
@@ -230,9 +262,13 @@ namespace Interpreter
         {
             //Hardcode literal values into the keywords
             if (type == TokenType.TrueKeyword)
+            {
                 literal = true;
+            }
             else if (type == TokenType.FalseKeyword)
+            {
                 literal = false;
+            }
 
             TextSpan span = TextSpan.FromBounds(start, current);
             string text = source.Substring(span.Start, span.Length);

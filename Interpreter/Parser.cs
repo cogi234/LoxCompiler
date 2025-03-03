@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace Interpreter
+﻿namespace Interpreter
 {
     internal class Parser
     {
@@ -25,7 +23,9 @@ namespace Interpreter
             {
                 Statement? s = Declaration();
                 if (s != null)
+                {
                     statements.Add(s);
+                }
             }
 
             return statements;
@@ -37,9 +37,15 @@ namespace Interpreter
             try
             {
                 if (Match(TokenType.VarKeyword))
+                {
                     return VariableDeclaration();
+                }
+
                 if (Match(TokenType.FnKeyword))
+                {
                     return new Statement.ExpressionStatement(FunctionDeclaration("function"));
+                }
+
                 return Statement();
             }
             catch (ParseError)
@@ -66,17 +72,34 @@ namespace Interpreter
         private Statement Statement()
         {
             if (Match(TokenType.IfKeyword))
+            {
                 return IfStatement();
+            }
+
             if (Match(TokenType.WhileKeyword))
+            {
                 return WhileStatement();
+            }
+
             if (Match(TokenType.ForKeyword))
+            {
                 return ForStatement();
+            }
+
             if (Match(TokenType.BreakKeyword))
+            {
                 return BreakStatement();
+            }
+
             if (Match(TokenType.ReturnKeyword))
+            {
                 return ReturnStatement();
+            }
+
             if (Match(TokenType.LeftBrace))
+            {
                 return Block();
+            }
 
             return ExpressionStatement();
         }
@@ -95,7 +118,9 @@ namespace Interpreter
             {
                 Statement? statement = Declaration();
                 if (statement != null)
+                {
                     statements.Add(statement);
+                }
             }
 
             Token closing = Consume(TokenType.RightBrace, "Expected '}' after block.");
@@ -136,20 +161,32 @@ namespace Interpreter
 
             Statement? initializer = null;
             if (Match(TokenType.Semicolon))
+            {
                 initializer = null;
+            }
             else if (Match(TokenType.VarKeyword))
+            {
                 initializer = VariableDeclaration();
+            }
             else
+            {
                 initializer = ExpressionStatement();
+            }
 
             Expression? condition = null;
             if (!Check(TokenType.Semicolon))
+            {
                 condition = Expression();
+            }
+
             Consume(TokenType.Semicolon, "Expected ';' after loop condition.");
 
             Expression? increment = null;
             if (!Check(TokenType.RightParenthesis))
+            {
                 increment = Expression();
+            }
+
             Consume(TokenType.RightParenthesis, "Expected ')' after for clauses.");
 
             loopCount++;
@@ -157,14 +194,21 @@ namespace Interpreter
             loopCount--;
 
             if (increment != null)
+            {
                 body = new Statement.Block(null, new List<Statement>([body, new Statement.ExpressionStatement(increment)]), null);
+            }
 
             if (condition == null)
+            {
                 condition = new Expression.Literal(new Token(TokenType.TrueKeyword, "true", keyword.Span, true));
+            }
+
             body = new Statement.While(keyword, condition, body);
 
             if (initializer != null)
+            {
                 body = new Statement.Block(null, new List<Statement>([initializer, body]), null);
+            }
 
             return body;
         }
@@ -183,7 +227,10 @@ namespace Interpreter
         {
             Token keyword = Previous();
             if (loopCount == 0)
+            {
                 Error(keyword, "Can't break outside of a loop.");
+            }
+
             Consume(TokenType.Semicolon, "Expected ';' after value.");
             return new Statement.Break(keyword);
         }
@@ -408,11 +455,15 @@ namespace Interpreter
                 TokenType.TrueKeyword,
                 TokenType.NilKeyword
                 ))
+            {
                 return new Expression.Literal(Previous());
+            }
 
             //Variable expression
             if (Match(TokenType.Identifier))
+            {
                 return new Expression.Variable(Previous());
+            }
 
             // Grouping
             if (Match(TokenType.LeftParenthesis))
@@ -434,7 +485,9 @@ namespace Interpreter
         private Token Consume(TokenType type, string errorMessage)
         {
             if (Check(type))
+            {
                 return Advance();
+            }
 
             throw Error(Peek(), errorMessage);
         }
@@ -472,7 +525,9 @@ namespace Interpreter
             while (!IsAtEnd())
             {
                 if (Previous().Type == TokenType.Semicolon)
+                {
                     return;
+                }
 
                 switch (Peek().Type)
                 {

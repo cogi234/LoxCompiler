@@ -17,11 +17,17 @@
                 ErrorReporter errorReporter = new ErrorReporter();
                 RunFile(args[0], errorReporter);
                 if (errorReporter.HadCompilerError)
+                {
                     return 65;
+                }
                 else if (errorReporter.HadRuntimeError)
+                {
                     return 70;
+                }
                 else
+                {
                     return 0;
+                }
             }
 
             RunPrompt();
@@ -42,7 +48,9 @@
                 Console.Write("> ");
                 string? line = Console.ReadLine();
                 if (line == null || line == "exit")
+                {
                     break;
+                }
 
                 ErrorReporter errorReporter = new ErrorReporter();
                 Run(line, errorReporter);
@@ -65,7 +73,9 @@
 
             interpreter.Interpret(statements, errorReporter);
             if (errorReporter.HadRuntimeError)
+            {
                 errorReporter.Display(Console.Error, ErrorType.Runtime);
+            }
         }
     }
 }

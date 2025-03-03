@@ -45,7 +45,9 @@ namespace Interpreter
                 this.environment = environment;
 
                 foreach (Statement statement in statements)
+                {
                     Execute(statement);
+                }
             }
             finally
             {
@@ -58,7 +60,9 @@ namespace Interpreter
         {
             object? value = null;
             if (statement.Initializer != null)
+            {
                 value = Evaluate(statement.Initializer);
+            }
 
             environment.Define(statement.Name.Lexeme, value);
 
@@ -77,9 +81,14 @@ namespace Interpreter
         public object? Visit(Statement.If statement)
         {
             if (GetBooleanValue(Evaluate(statement.Condition)))
+            {
                 Execute(statement.ThenBranch);
+            }
             else if (statement.ElseBranch != null)
+            {
                 Execute(statement.ElseBranch);
+            }
+
             return null;
         }
         public object? Visit(Statement.While statement)
@@ -101,7 +110,9 @@ namespace Interpreter
         {
             object? value = null;
             if (statement.Expression != null)
+            {
                 value = Evaluate(statement.Expression);
+            }
 
             throw new ReturnException(value);
         }
@@ -122,7 +133,10 @@ namespace Interpreter
         {
             Function function = new Function(expression, environment);
             if (expression.NameToken != null)
+            {
                 environment.Define(expression.NameToken.Lexeme, function);
+            }
+
             return function;
         }
         public object? Visit(Expression.Logical expression)
@@ -132,12 +146,16 @@ namespace Interpreter
             if (expression.Operator.Type == TokenType.OrKeyword)
             {
                 if (GetBooleanValue(left))
+                {
                     return left;
+                }
             }
             else if (expression.Operator.Type == TokenType.AndKeyword)
             {
                 if (!GetBooleanValue(left))
+                {
                     return left;
+                }
             }
 
             return Evaluate(expression.Right);
@@ -170,9 +188,15 @@ namespace Interpreter
                     return (double)left - (double)right;
                 case TokenType.Plus:
                     if (left.GetType() == typeof(double) && right.GetType() == typeof(double))
+                    {
                         return (double)left + (double)right;
+                    }
+
                     if (left.GetType() == typeof(string) && right.GetType() == typeof(string))
+                    {
                         return (string)left + (string)right;
+                    }
+
                     throw new RuntimeError(expression.Operator, "Operands must be two numbers or two strings.");
                 case TokenType.Slash:
                     CheckNumberOperands(expression.Operator, left, right);
@@ -247,21 +271,32 @@ namespace Interpreter
         private bool GetBooleanValue(object? value)
         {
             if (value == null)
+            {
                 return false;
+            }
+
             if (value.GetType() == typeof(bool))
+            {
                 return (bool)value;
+            }
+
             return true;
         }
         private bool IsEqual(object? a, object? b)
         {
             if (a == null)
+            {
                 return b == null;
+            }
+
             return a.Equals(b);
         }
         private string Stringify(object? value)
         {
             if (value == null)
+            {
                 return "nil";
+            }
 
             return value.ToString() ?? "";
         }
@@ -271,14 +306,20 @@ namespace Interpreter
         private void CheckNumberOperand(Token operatorToken, object? operand)
         {
             if (operand != null && operand.GetType() == typeof(double))
+            {
                 return;
+            }
+
             throw new RuntimeError(operatorToken, "Operand must be a number.");
         }
         private void CheckNumberOperands(Token operatorToken, object? left, object? right)
         {
             if (left != null && left.GetType() == typeof(double)
                 && right != null && right.GetType() == typeof(double))
+            {
                 return;
+            }
+
             throw new RuntimeError(operatorToken, "Operands must be numbers.");
         }
         internal class RuntimeError : Exception
