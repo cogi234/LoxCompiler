@@ -64,12 +64,6 @@ namespace Interpreter
 
             return null;
         }
-        public object? Visit(Statement.Function statement)
-        {
-            Function function = new Function(statement, environment);
-            environment.Define(statement.NameToken.Lexeme, function);
-            return null;
-        }
         public object? Visit(Statement.ExpressionStatement statement)
         {
             Evaluate(statement.Expression);
@@ -124,9 +118,12 @@ namespace Interpreter
             environment.Assign(expression.Name, value);
             return value;
         }
-        public object? Visit(Expression.Lambda expression)
+        public object? Visit(Expression.Function expression)
         {
-            return new Function(expression, environment);
+            Function function = new Function(expression, environment);
+            if (expression.NameToken != null)
+                environment.Define(expression.NameToken.Lexeme, function);
+            return function;
         }
         public object? Visit(Expression.Logical expression)
         {

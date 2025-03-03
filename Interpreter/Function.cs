@@ -2,10 +2,10 @@
 {
     internal class Function : ICallable
     {
-        private readonly IFunctionDeclaration declaration;
+        private readonly Expression.Function declaration;
         private readonly Environment closure;
 
-        public Function(IFunctionDeclaration declaration, Environment closure)
+        public Function(Expression.Function declaration, Environment closure)
         {
             this.declaration = declaration;
             this.closure = closure;

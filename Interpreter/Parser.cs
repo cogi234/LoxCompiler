@@ -1,4 +1,6 @@
-﻿namespace Interpreter
+﻿using System.Linq.Expressions;
+
+namespace Interpreter
 {
     internal class Parser
     {
@@ -37,10 +39,10 @@
                 if (Match(TokenType.VarKeyword))
                     return VariableDeclaration();
                 if (Match(TokenType.FnKeyword))
-                    return Function("function");
+                    return new Statement.ExpressionStatement(FunctionDeclaration("function"));
                 return Statement();
             }
-            catch (ParseError error)
+            catch (ParseError)
             {
                 Synchronize();
                 return null;
@@ -60,29 +62,6 @@
             Consume(TokenType.Semicolon, "Expected ';' after variable declaration.");
 
             return new Statement.VariableDeclaration(varToken, name, initializer);
-        }
-        private Statement.Function Function(string kind)
-        {
-            Token keyword = Previous();
-            Token name = Consume(TokenType.Identifier, $"Expected {kind} name.");
-            Consume(TokenType.LeftParenthesis, $"Expected '(' after {kind} name.");
-            List<Token> parameters = new List<Token>();
-            if (!Check(TokenType.RightParenthesis))
-            {
-                do
-                {
-                    if (parameters.Count >= MAX_ARGUMENTS)
-                    {
-                        Error(Peek(), $"Can't have more than {MAX_ARGUMENTS} parameters.");
-                    }
-                    parameters.Add(Consume(TokenType.Identifier, "Expected parameter name."));
-                } while (Match(TokenType.Comma));
-            }
-            Consume(TokenType.RightParenthesis, "Expected ')' after parameters.");
-            Consume(TokenType.LeftBrace, $"Expected '{{' before {kind} body.");
-            Statement.Block block = Block();
-
-            return new Statement.Function(keyword, name, parameters, block);
         }
         private Statement Statement()
         {
@@ -219,7 +198,7 @@
         {
             if (Match(TokenType.FnKeyword))
             {
-                return Lambda();
+                return FunctionDeclaration();
             }
 
             Expression expression = Or();
@@ -240,10 +219,15 @@
 
             return expression;
         }
-        private Expression.Lambda Lambda()
+        private Expression.Function FunctionDeclaration(string kind = "function")
         {
             Token keyword = Previous();
-            Consume(TokenType.LeftParenthesis, $"Expected '(' after fn keyword.");
+            Token? name = null;
+            if (Check(TokenType.Identifier))
+            {
+                name = Consume(TokenType.Identifier, $"Expected {kind} name.");
+            }
+            Consume(TokenType.LeftParenthesis, $"Expected '(' after {(name != null ? kind : "lambda")} declaration.");
             List<Token> parameters = new List<Token>();
             if (!Check(TokenType.RightParenthesis))
             {
@@ -257,10 +241,10 @@
                 } while (Match(TokenType.Comma));
             }
             Consume(TokenType.RightParenthesis, "Expected ')' after parameters.");
-            Consume(TokenType.LeftBrace, $"Expected '{{' before function body.");
+            Consume(TokenType.LeftBrace, $"Expected '{{' before {kind} body.");
             Statement.Block block = Block();
 
-            return new Expression.Lambda(keyword, parameters, block);
+            return new Expression.Function(keyword, name, parameters, block);
 
         }
         private Expression Or()

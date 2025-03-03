@@ -13,7 +13,6 @@
         {
             T Visit(ExpressionStatement statement);
             T Visit(VariableDeclaration statement);
-            T Visit(Function statement);
             T Visit(Block statement);
             T Visit(If statement);
             T Visit(While statement);
@@ -50,28 +49,6 @@
                 Keyword = keyword;
                 Name = name;
                 Initializer = initializer;
-            }
-
-            public override T Accept<T>(IVisitor<T> visitor)
-            {
-                return visitor.Visit(this);
-            }
-        }
-        internal class Function : Statement, IFunctionDeclaration
-        {
-            Token Keyword { get; }
-            public string Name => NameToken.Lexeme;
-            public Token NameToken { get; }
-            public List<Token> Parameters { get; }
-            public Block Body { get; }
-
-            public Function(Token keyword, Token name, List<Token> parameters, Block body)
-                : base(TextSpan.FromBounds(keyword.Span.Start, body.Span.End))
-            {
-                Keyword = keyword;
-                NameToken = name;
-                Parameters = parameters;
-                Body = body;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)

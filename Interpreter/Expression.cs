@@ -14,7 +14,7 @@ namespace Interpreter
         internal interface IVisitor<T>
         {
             T Visit(Assignment expression);
-            T Visit(Lambda expression);
+            T Visit(Function expression);
             T Visit(Logical expression);
             T Visit(Binary expression);
             T Visit(Unary expression);
@@ -46,18 +46,20 @@ namespace Interpreter
                 return visitor.Visit(this);
             }
         }
-        internal class Lambda : Expression, IFunctionDeclaration
+        internal class Function : Expression
         {
             public Token Keyword { get; }
-            public string Name => "lambda";
+            public string Name => NameToken?.Lexeme ?? "lambda";
+            public Token? NameToken { get; }
             public List<Token> Parameters { get; }
             public Block Body { get; }
 
 
-            public Lambda(Token keyword, List<Token> parameters, Block body)
+            public Function(Token keyword, Token? nameToken, List<Token> parameters, Block body)
                 : base(TextSpan.FromBounds(keyword.Span.Start, body.Span.End))
             {
                 Keyword = keyword;
+                NameToken = nameToken;
                 Parameters = parameters;
                 Body = body;
             }

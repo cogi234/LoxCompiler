@@ -10,8 +10,7 @@ nonterminal -> "terminal" nonterminal LITERAL_TERMINAL ;
 program             -> statement\* EOF ;
 declaration         -> variableDeclaration | functionDeclaration | statement ;
 variableDeclaration -> "var" IDENTIFIER ( "=" expression )? ";" ;
-functionDeclaration -> "fn" function ;
-function            -> IDENTIFIER "(" parameters? ")" block ;
+functionDeclaration -> function ;
 statement           -> expressionStatement | printStatement | breakStatement |                            ifStatement | whileStatement| forStatement | block |                               returnStatement ;
 forStatement        -> "for" "(" ( variableDeclaration | expressionStatement | ";"                                   ) expression? ";" expression? ")" statement ;
 whileStatement      -> "while" "(" expression ")" statement;
@@ -25,8 +24,8 @@ breakStatement      -> "break" ";" ;
 ```
 expression -> assignment ;
 assigment  -> IDENTIFIER "=" assignment
-              | logicalOr | lambda;
-lambda     -> "fn" "(" parameters? ")" block ;
+              | logicalOr | function;
+function     -> "fn" IDENTIFIER? "(" parameters? ")" block ;
 logicalOr  -> logicalAnd ( "or" logicalAnd )* ;
 logicalOr  -> equality ( "and" equality )* ;
 equality   -> comparison ( ( "!=" | "\=\=" ) comparison )\* ;
